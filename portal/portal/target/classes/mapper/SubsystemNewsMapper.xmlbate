@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.subsystem.news.dao.mapper.SubsystemNewsMapper">
+
+    <select id="selectPageVo" resultType="cn.exrick.xboot.modules.subsystem.news.entity.SubsystemNews">
+
+  SELECT * FROM t_subsystem_news where title=#{title}
+    </select>
+
+</mapper>

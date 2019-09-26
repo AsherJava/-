@@ -1,0 +1,22 @@
+
+.common-icon-picture{
+    display: inline-block;
+    width:1rem;
+    height:1rem;
+    cursor: pointer;
+}
+/*小对号图片*/
+.common-icon-picture-check{
+    background: url("../../../assets/app/img/login/check.png") no-repeat center center;
+    background-size: 100% 100%;
+}
+/*服务器小地球图片*/
+.commonBorder .common-icon-picture-server{
+    background: url("../../../assets/app/img/login/tupian (3).png") no-repeat center center;
+    background-size: 100% 100%;
+}
+/*边框圆灰图片*/
+.commonBorder .common-icon-picture-border{
+    background: url("../../../assets/app/img/login/tupian (5).png") no-repeat center center;
+    background-size: 100% 100%;
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.backlogOrFull.dao.mapper.BacklogOrFullMapper">
+
+    <!--待办已办查询getALL(),排序asc-->
+    <select id="selectAllBacklogOrFull" resultType="cn.exrick.xboot.modules.backlogOrFull.entity.BacklogOrFull"  >
+      SELECT * FROM `t_backlog_or_full`  ORDER BY sort_order ASC
+    </select>
+
+</mapper>

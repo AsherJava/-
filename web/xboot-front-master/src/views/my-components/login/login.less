@@ -1,0 +1,121 @@
+@colorLine:#1890FF;
+#pages-login{
+  width: 100%;
+  height: 100%;
+  .main{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    .pic{
+      flex: 744;//
+      background: url("../../../assets/pages-login/login@2x.png") no-repeat;
+      background-size: 100% 100%;
+      .span-img{
+        display: inline-block;
+        padding-bottom: 30px;
+      }
+    }
+    .login{
+      flex: 356;
+      .login-flex-hc{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+      .login-flex-child{
+        width: 100%;
+        height: auto;
+      }
+      .title{
+        text-align: center;
+        font-size:33px;
+        font-family:PingFang-SC-Medium;
+        font-weight:normal;
+        color:rgba(51,51,51,1);
+        line-height: 33px;
+        padding-bottom: 10px;
+      }
+
+    }
+  }
+  .switch{
+    text-align: center;
+    padding-bottom: 30px;
+    .switch-span{
+      font-size:20px;
+      font-family:PingFang-SC-Medium;
+      font-weight:normal;
+      color:rgba(153,153,153,1);
+      line-height:20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .switchButton{
+      display: inline-block;
+      position: relative;
+      top: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border:1px solid rgba(24,144,255,1);
+      margin-right:8px ;
+
+    }
+    .election{
+      padding-right: 10px;
+    }
+    .switchButtonSelect{
+      display: inline-block;
+      position: relative;
+      top: 3px;
+      width: 20px;
+      height: 20px;
+      margin-right:8px ;
+      border-radius: 50%;
+      background:url("../../../assets/pages-login/select.png");
+    }
+  }
+  .login-content{
+    padding: 0 130px;
+  }
+  .deng{
+    min-width: 320px;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:rgba(24,144,255,1);
+    outline: none;
+    border: none;
+    border-radius:8px;
+    font-size:21px;
+    font-family:PingFang-SC-Regular;
+    box-shadow:0px 3px 9px 0px rgba(0, 255, 114, 0.35);
+    font-weight:400;
+    color:rgba(255,255,255,1);
+  }
+  .line-p{
+    line-height: 0;
+    text-align: center;
+    padding-bottom: 40px;
+  }
+  .line{
+    display: inline-block;
+    width: 68px;
+    height: 2px;
+    background: @colorLine;
+  }
+}
+.flex{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wh{
+  width: 100%;
+  height: 100%;
+}

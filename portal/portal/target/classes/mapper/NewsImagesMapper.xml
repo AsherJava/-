@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.news.dao.mapper.NewsImagesMapper">
+
+    <select id="selectPageVo" resultType="cn.exrick.xboot.modules.news.entity.NewsImages">
+  SELECT * FROM t_news_images where old_name=#{old_name}
+    </select>
+
+
+    <!--根据新闻id删除（注意：是新闻id不是图片的id）-->
+    <delete id="deleteNewsImagesByNewsId"   parameterType="Map">
+           DELETE FROM t_news_images WHERE news_id =#{map.id}
+    </delete>
+
+    <select id="selectNewsImagesByNewsId" resultType="cn.exrick.xboot.modules.news.entity.NewsImages"  >
+        select * FROM t_news_images WHERE news_id =#{id}
+    </select>
+</mapper>

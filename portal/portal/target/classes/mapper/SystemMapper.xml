@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.system.dao.mapper.SystemMapper">
+    <!--快捷入口的条件查询-->
+    <select id="selectSystemPageVoMap" resultType="cn.exrick.xboot.modules.system.entity.System"  parameterType="Map">
+        SELECT * FROM t_system where 1=1
+        <if test="map.sys_name !=null">
+            and sys_name like CONCAT('%', #{map.sys_name}, '%')
+        </if>
+        <if test="map.url !=null">
+            and url like   CONCAT('%', #{map.url}, '%')
+        </if>
+        ORDER BY sort_order ASC
+    </select>
+<!--protal查询出未被禁用的快捷入口-->
+    <select id="selectSystemPortal" resultType="cn.exrick.xboot.modules.system.entity.System"  parameterType="Map">
+        SELECT * FROM t_system where status=0
+        ORDER BY sort_order ASC
+    </select>
+</mapper>

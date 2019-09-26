@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.backlogOrFullList.dao.mapper.backlogOrFullListMapper">
+
+
+    <!--待办已办数据列表条件查询-->
+    <select id="selectBacklogOrFullListPageVoMap"
+            resultType="cn.exrick.xboot.modules.backlogOrFullList.entity.BacklogOrFullList">
+        SELECT * FROM `t_backlog_or_full_list` where 1=1
+        <if test='backlogOrFullList.userCode!=null and backlogOrFullList.userCode.trim()!=""'>
+            and user_code like CONCAT('%', #{backlogOrFullList.userCode ,jdbcType=VARCHAR}, '%')
+        </if>
+        <if test='backlogOrFullList.moduleName!=null and backlogOrFullList.moduleName.trim()!=""'>
+            and module_name like CONCAT('%', #{backlogOrFullList.moduleName ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*标题*/
+        <if test='backlogOrFullList.title!=null and backlogOrFullList.title.trim()!=""'>
+            and title like CONCAT('%', #{backlogOrFullList.title ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*数据源*/
+        <if test='backlogOrFullList.source!=null and backlogOrFullList.source.trim()!=""'>
+            and source like CONCAT('%', #{backlogOrFullList.source ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*code*/
+        <if test='backlogOrFullList.code!=null and backlogOrFullList.code.trim()!=""'>
+            and code like CONCAT('%', #{backlogOrFullList.code ,jdbcType=VARCHAR}, '%')
+        </if>
+
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!--portal待办已办数据列表条件查询-->
+    <select id="selectBacklogOrFullListByMap"
+            resultType="cn.exrick.xboot.modules.backlogOrFullList.entity.BacklogOrFullList" parameterType="Map">
+        /*SELECT * FROM `t_backlog_or_full_list` where 1=1*/
+        SELECT * FROM `t_backlog_or_full_list` b left JOIN t_dict_data d on b.module_name=d.title where 1=1
+
+        <if test='map.backlogOrFullList.userCode!=null and map.backlogOrFullList.userCode.trim()!=""'>
+            and user_code =#{map.backlogOrFullList.userCode,jdbcType=VARCHAR}
+        </if>
+        /*模块名称*/
+       <!-- <if test='map.backlogOrFullList.moduleName!=null and map.backlogOrFullList.moduleName.trim()!=""'>
+            and module_name like CONCAT('%', #{map.backlogOrFullList.moduleName ,jdbcType=VARCHAR}, '%')
+
+        </if>-->
+        <if test='map.backlogOrFullList.moduleName!=null and map.backlogOrFullList.moduleName.trim()!=""'>
+        and module_name =#{map.backlogOrFullList.moduleName,jdbcType=VARCHAR}
+
+         </if>
+        /*标题*/
+        <if test='map.backlogOrFullList.title!=null and map.backlogOrFullList.title.trim()!=""'>
+            and b.title like CONCAT('%', #{map.backlogOrFullList.title ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*数据源*/
+        <if test='map.backlogOrFullList.source!=null and map.backlogOrFullList.source.trim()!=""'>
+            and b.source like CONCAT('%', #{map.backlogOrFullList.source ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*code*/
+        <if test='map.backlogOrFullList.code!=null and map.backlogOrFullList.code.trim()!=""'>
+            and code =#{map.backlogOrFullList.code,jdbcType=VARCHAR}
+        </if>
+        ORDER BY b.sort_order ASC, b.create_time DESC
+        <if test="map.num !=null">
+            LIMIT   #{map.num}
+        </if>
+    </select>
+
+    <select id="selectInfoId"
+            resultType="java.lang.String" parameterType="Map">
+            select info_id from t_backlog_or_full_list
+            where info_id = #{ mapId.infoId } and user_code = #{ mapId.userCode }
+
+    </select>
+
+    <update id="UpdateMseeageType" parameterType="Map">
+            update t_backlog_or_full_list
+            set code = #{ map.code }
+            where  info_id = #{ map.infoId } and user_code = #{ map.userCode }
+    </update>
+
+
+</mapper>

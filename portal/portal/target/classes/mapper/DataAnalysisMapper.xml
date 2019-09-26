@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.dataAnalysis.dao.mapper.DataAnalysisMapper">
+
+    <!--数据分析管理的条件查询-->
+    <select id="selectDataAnalysisPageVoMap" resultType="cn.exrick.xboot.modules.dataAnalysis.entity.DataAnalysis"  parameterType="Map">
+        SELECT * FROM t_data_analysis  where 1=1
+        <if test="map.department !=null">
+            and department like CONCAT('%', #{map.department}, '%')
+        </if>
+        <if test="map.url !=null">
+            and url like CONCAT('%', #{map.url}, '%')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

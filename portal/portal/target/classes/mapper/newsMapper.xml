@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.news.dao.mapper.newsMapper">
+
+
+    <select id="selectNewsByTop" resultType="cn.exrick.xboot.modules.news.entity.news"  >
+        SELECT * FROM t_news WHERE news_is_top =#{news_is_top}
+    </select>
+
+
+
+
+
+    <!--新闻的条件查新-->
+    <select id="selectNewsVoMap" resultType="cn.exrick.xboot.modules.news.entity.news">
+
+        SELECT
+        id,
+        news_title,
+        news_desc,
+        news_image_path,
+        news_rate,
+        news_is_top,
+        url,
+        source,
+        image_url,
+        info_code,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        news_id,
+        del_flag from `t_news`where 1=1
+        <if test="news.newsTitle !=null">
+            and news_title like CONCAT('%', #{news.newsTitle}, '%')
+        </if>
+
+        <if test="news.source !=null">
+            and source like    CONCAT('%', #{news.source}, '%')
+        </if>
+        <if test="news.infoCode !=null">
+            and info_code =#{news.infoCode}
+        </if>
+        ORDER BY news_rate ASC, create_time DESC
+    </select>
+
+    <!--portal新闻的条件查新-->
+    <select id="selectPortalNewsVoMap" resultType="cn.exrick.xboot.modules.news.entity.news">
+
+        SELECT
+*
+       from  `t_news`where 1=1
+
+
+        <if test='news.source !=null and news.source!=""'>
+            and source =#{news.source}
+        </if>
+        <if test='news.infoCode !=null and news.infoCode!=""'>
+            and info_code =#{news.infoCode}
+        </if>
+        ORDER BY news_rate ASC, create_time DESC
+        <if test='news.num !=null and news.num!=""'>
+            LIMIT   #{news.num}
+        </if>
+    </select>
+
+</mapper>
