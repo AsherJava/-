@@ -29,6 +29,16 @@
         WHERE uu.mobile = #{mobile}
     </select>
 
+    <select id="findUserRoleByRoleId" resultType="cn.exrick.xboot.modules.base.entity.UserRole" >
+        SELECT * FROM `t_user_role`
+        WHERE role_id = #{roleId,jdbcType=VARCHAR}
+       /* SELECT * FROM t_user_role*/
+    </select>
+    <select id="findUserRoleByUserId" resultType="cn.exrick.xboot.modules.base.entity.UserRole" >
+        SELECT * FROM `t_user_role`
+        WHERE user_id = #{userId,jdbcType=VARCHAR}
+       /* SELECT * FROM t_user_role*/
+    </select>
     <select id="IsWxUser" resultType="java.lang.Integer" parameterType="Map">
         SELECT uu.wx_status
         FROM t_user uu

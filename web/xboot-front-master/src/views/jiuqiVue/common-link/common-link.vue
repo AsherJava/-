@@ -1032,7 +1032,7 @@
                 var myForm = document.createElement("form");
                 myForm.method = "post";
 
-               myForm.action = "http://10.39.5.120:9797/portal/sso";
+                myForm.action = "http://10.39.5.120:9797/portal/sso";
                 //myForm.action = "http://10.1.13.14:8899/xboot/usertest/test";
 
                 //创建input begin

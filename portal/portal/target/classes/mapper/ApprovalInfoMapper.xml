@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.ApprovalInfo.dao.mapper.ApprovalInfoMapper">
+
+<!--三权分立查询超级管理员登录的审批数据精确查询-->
+    <select id="selectApprovalInfo"
+            resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
+        SELECT * FROM `t_approval_info` t where 1=1
+        /*身份证号*/
+        <if test='userCode!=null and userCode.trim()!=""'>
+            and user_code =  #{userCode ,jdbcType=VARCHAR}
+        </if>
+        /*提交人姓名*/
+        <if test='name!=null and name.trim()!=""'>
+            and  t.name =  #{name ,jdbcType=VARCHAR}
+        </if>
+        /*描述*/
+        <if test='description!=null and description.trim()!=""'>
+            and  t.description   like CONCAT('%', #{description ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*审批状态*/
+        <if test='approvalStatus!=null'>
+            and  t.approval_status =  #{approvalStatus}
+        </if>
+        /*审批信息过期时间*/
+        <if test='expirationTime!=null'>
+            and  t.expiration_time =  #{expirationTime}
+        </if>
+
+        /*审批员姓名*/
+        <if test='assessor_username!=null and description.trim()!=""'>
+            and  t.assessor_username   =#{assessor_username ,jdbcType=VARCHAR}
+        </if>
+        /*大于当前时间未过期的审批数据也就是待审批数据*/
+        <if test='nowTime!=null'>
+            and  t.expiration_time >  #{nowTime}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+
+    <!--三权分立查询超级管理员登录的审批数据模糊查询-->
+    <select id="approvalInfoFuzzyQuery"
+            resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
+        SELECT * FROM `t_approval_info` t where 1=1
+        /*身份证号*/
+        <if test='userCode!=null and userCode.trim()!=""'>
+            and user_code like CONCAT('%', #{userCode ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*提交人姓名*/
+        <if test='name!=null and name.trim()!=""'>
+            and  t.name like CONCAT('%', #{name ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*描述*/
+        <if test='description!=null and description.trim()!=""'>
+            and  t.description   like CONCAT('%', #{description ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*审批状态*/
+        <if test='approvalStatus!=null'>
+            and  t.approval_status =  #{approvalStatus}
+        </if>
+        /*审批员姓名*/
+        <if test='assessor_username!=null and description.trim()!=""'>
+            and  t.assessor_username   like CONCAT('%', #{assessor_username ,jdbcType=VARCHAR}, '%')
+        </if>
+        /*大于当前时间未过期的审批数据也就是待审批数据*/
+        <if test='nowTime!=null'>
+            and  t.expiration_time >  #{nowTime}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

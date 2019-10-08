@@ -2,13 +2,13 @@ const CompressionPlugin = require('compression-webpack-plugin');
 const webpack = require('webpack')
 
 const URL_BASE= process.env.NODE_ENV === 'production'
-    ?'http://10.1.13.28:8899'
-    :'http://10.1.13.28:8899'//'http://10.1.13.14:8899'http://10.1.13.28:8899/app
+    ?'http://10.1.13.14:8899'
+    :'http://10.1.13.14:8899'//'http://10.1.13.14:8899'http://10.1.13.28:8899/app
 const URL_ONE='http://10.39.5.48:9797'
 module.exports = {
 
     devServer: {
-        host: '10.1.13.6',
+        host: '10.1.13.14',
         // //host: 'localhost',//     --host 10.1.13.6
         port: 8088,
         proxy: {
