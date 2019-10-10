@@ -42,3 +42,6 @@ export const generateQRCode = (params)=>{
 export const CheckLogin = (params)=>{
     return   poJson('/qrcode/qrcodeCheckLogin', params)
 }
+export const registAssessor = (params)=>{
+    return  postRequest('/role/registAssessor', params)
+}

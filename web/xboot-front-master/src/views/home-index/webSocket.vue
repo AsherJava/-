@@ -5,12 +5,12 @@
          <button @click="send()">发送消息</button>
          <br>
          <button @click="closeWebSocket()">关闭websocket连接</button>
-        <div id="qrcode" ></div>
+        <button @click="websocketInit('test')">点击链接test</button>
     </div>
 </template>
 <script>
     import Cookies from "js-cookie";
-    import QRCode  from "qrcodejs2"
+
     export default {
         name: "WebSocket",
         components: {
@@ -21,47 +21,43 @@
                 text: '',
                 data: '',
                 websocket: null,
-                link: 'https://baidu.com'
             }
         },
       watch:{
             data(val){
-         // if(val==200){
-         // } else if(val){
-         //  let data=val
-         //  this.$emit('change',data)
-         //        }
             }
       },
         mounted() {
-   //          let userInfo = JSON.parse(Cookies.get("userInfo"));
-   //          let username = userInfo.username;
-   //          if ('WebSocket' in window) {
-   //              this.websocket = new WebSocket('ws://10.1.13.14:8899/websocket/'+ username)
-   //              //this.websocket = new WebSocket('ws://10.1.13.14:8080/portalManage/websocket/'+ username)
-   //              this.initWebSocket()
-   //          } else {
-   //              alert('当前浏览器不支持websocket,请升级浏览器')
-   //          }
-   // this.qrCode()
+            let userInfo =Cookies.get("userInfo");
+               if(userInfo){
+                   if ('WebSocket' in window) {
+                       this.websocket = new WebSocket('ws://10.1.13.14:8899/websocket/'+ JSON.parse(userInfo).username)
+                       this.initWebSocket()
+                   } else {
+                       alert('当前浏览器不支持websocket,请升级浏览器')
+                   }
+               }
+
+
         },
         beforeDestroy() {
             this.onbeforeunload()
         },
         methods: {
-            init(){//
+            init(){
 
             },
-            qrCode() {
-                let that = this;
-                let qrcode = new QRCode('qrcode', {
-                    width: 124,
-                    height: 124,        // 高度
-                    text:  this.link,   // 二维码内容
-                    // render: 'canvas' ,   // 设置渲染方式（有两种方式 table和canvas，默认是canvas）
-                    // background: '#f0f',   // 背景色
-                    // foreground: '#ff0'    // 前景色
-                })
+            websocketInit(username){
+                if(username){
+                    if ('WebSocket' in window) {
+                        this.websocket = new WebSocket('ws://10.1.13.14:8899/websocket/'+ username)
+                        //this.websocket = new WebSocket('ws://10.1.13.14:8080/portalManage/websocket/'+ username)
+                        this.initWebSocket()
+                    } else {
+                        alert('当前浏览器不支持websocket,请升级浏览器')
+                    }
+                }
+
             },
             isData(data){
                 let item=JSON.parse(data);
@@ -107,7 +103,10 @@
                 this.text = ''
             },
             closeWebSocket() {
-                this.websocket.close()
+                if(this.websocket){
+                    this.websocket.close()
+                }
+
             }
         }
     }

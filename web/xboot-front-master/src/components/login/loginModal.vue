@@ -1,8 +1,12 @@
 <template>
     <Modal
             :class="modalId"
-            v-model="modal"
+             v-model="modal"
             :footer-hide="!showFooter"
+            :mask-closable="maskClosable"
+            :closable="Closable"
+            :width="Width"
+
     >
         <div slot="header" v-if="showHeader">
             <slot name="header">
@@ -44,6 +48,14 @@
             Width:{
                 type: String|Number,
                 default:'',
+            },
+            maskClosable:{
+                type: Boolean,
+                default:true,
+            },
+            Closable:{
+                type: Boolean,
+                default:true,
             },
             Title:{
                 type: String|Number,

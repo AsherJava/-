@@ -320,13 +320,15 @@ export default {
   created() {
     // 显示打开的页面的列表
     this.$store.commit("setOpenedList");
-    if(pageRouter(this.getStore("roles"))==0){
-
-    }else {
-      this.$router.push({
-        name:pageReturn(this.getStore("roles"))
-      });
-    }
+    // console.log(this.getStore("roles"))
+   // console.log(pageReturn(this.getStore("roles")))
+    // if(pageRouter(this.getStore("roles"))==0){
+    //
+    // }else {
+    //   this.$router.push({
+    //     name:pageReturn(this.getStore("roles"))
+    //   });
+    // }
 
   }
 };

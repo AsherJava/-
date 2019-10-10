@@ -168,7 +168,15 @@ export function cardid (code) {
   list.push(msg)
   return list
 }
+/**
+ * 判断身份证号码
+ */
+export function isCardId(item){
+  let reg=/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+  return  !reg.test(item)
 
+
+}
 /**
  * 判断手机号码是否正确
  */

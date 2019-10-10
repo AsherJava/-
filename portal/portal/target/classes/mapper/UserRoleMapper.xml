@@ -23,6 +23,10 @@
         WHERE uu.idcard = #{idcard}
     </select>
 
+    <select id="findUsernamesByRoleId" resultType="cn.exrick.xboot.modules.base.entity.User">
+        SELECT uu.id,uu.username FROM `t_user` uu left JOIN t_user_role ur on uu.id=ur.user_id where ur.role_id=#{roleId}
+    </select>
+
     <select id="findMobileByName" resultType="java.lang.String">
         SELECT uu.username
         FROM t_user uu

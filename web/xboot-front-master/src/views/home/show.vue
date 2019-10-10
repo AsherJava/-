@@ -1,6 +1,15 @@
-<style lang="less">
-</style>
+<style lang="less" scoped>
+  #text{
+    .weiui-textarea{
 
+  }
+  }
+
+
+</style>
+<style >
+
+</style>
 <template>
   <div>
     <Row>

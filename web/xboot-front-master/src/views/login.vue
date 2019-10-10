@@ -36,16 +36,17 @@
                         </div>
                         <div class="login-content" v-show="loginShow">
                             <div v-show="openIndex==0" v-model="form">
+                                <form>
                                 <input-use ref="input1" v-model="form.username" :data.sync=" form.username"
                                            :tips="tips.username.tips[0]"
                                            :placeholder="tips.username.tips[1]"></input-use>
                                 <input-use ref="input2" is-icon="lock" v-model="form.password"
+                                           Type="password"
                                            :data.sync="form.password" :tips="tips.password.tips[0]"
-                                           :placeholder="tips.password.tips[1]"></input-use>
+                                           :placeholder="tips.password.tips[1]"
+                                ></input-use>
+                                </form>
                             </div>
-                            <!--<div  v-show="openIndex==1"  v-model="form1">-->
-                            <!--<input-use  ref="input3" v-model="form1.code" :data.sync="form1.code" :tips="tips.codeAPP.tips[0]" is-icon="code"  :placeholder="tips.codeAPP.tips[1]" @countPlus="countChange"></input-use>-->
-                            <!--</div>-->
                             <div v-show="openIndex==1" v-model="form2">
                                 <input-use ref="input4" v-model="form2.username" :data.sync="form2.username"
                                            :tips="tips.usernameBusiness.tips[0]"
@@ -126,7 +127,6 @@
             </div>
             <login-modal v-model="loginModal" Width="650">
                 <div class="modalContent">
-
                     <p>APP动态码认证</p>
                     <p>
                     <span>
@@ -154,27 +154,61 @@
                 </div>
             </login-modal>
             <login-modal v-model="loginModal1" Width="650">
-                <div class="modalContent">
-                    <p>短信认证</p>
-                    <p>
+            <div class="modalContent">
+                <p>短信认证</p>
+                <p>
                     <span>
                     验证码已发送到您的手机，请查收！
                     </span>
-                    </p>
+                </p>
+                <div class="login-content login-content-modal">
+                    <div v-show="openIndex==0" v-model="form">
+                        <input-use ref="input7" is-icon="dynamic" v-model="form.password" :data.sync="form.password"
+                                   :tips="clockCode" :placeholder="tips.password.tips[1]" :tip-show='true'
+                                   @countPlus="clockCount"></input-use>
+                    </div>
+                    <div>
+                        <button class="deng" @click="buttonClick">登 录</button>
+                    </div>
+                </div>
+            </div>
+        </login-modal>
+            <login-modal  v-model="AssessorLogon"
+                         :mask-closable="false"
+                         Width="700">
+                <div class="modalContent">
+                    <p >审批员注册</p>
                     <div class="login-content login-content-modal">
-                        <div v-show="openIndex==0" v-model="form">
-                            <input-use ref="input7" is-icon="dynamic" v-model="form.password" :data.sync="form.password"
-                                       :tips="clockCode" :placeholder="tips.password.tips[1]" :tip-show='true'
-                                       @countPlus="clockCount"></input-use>
+                        <div  v-model="formAssessor" style="padding-top: 20px">
+                            <form >
+                            <input-use title="用户名称 ：" ref="input8" is-icon="nomal" v-model="formAssessor.username" :data.sync="formAssessor.username"
+                                       :tips="tips.username.tips[0]"
+                                        :placeholder="tips.username.tips[1]" ></input-use>
+                            <input-use title="用户密码 ："  Type="password" ref="input9" is-icon="nomal" v-model="formAssessor.password" :data.sync="formAssessor.password"
+                                       :tips="tips.password.tips[3]"
+                                        :placeholder="tips.password.tips[2]" ></input-use>
+                            <input-use title="重复密码 ："  Type="password" ref="input10" is-icon="nomal" v-model="formAssessor.passwordAgain" :data.sync="formAssessor.passwordAgain"
+                                       :tips="tips.passwordAgain.tips[0]"
+                                        :placeholder="tips.passwordAgain.tips[1]"></input-use>
+                            </form>
                         </div>
                         <div>
-                            <button class="deng" @click="buttonClick">登 录</button>
+                            <button class="deng" @click="registerAssess">注 册</button>
                         </div>
                     </div>
                 </div>
             </login-modal>
+            <login-modal v-model="assessorActive"
+                         :mask-closable="false"
+                         :Closable="false"
+                         Width="650"
+                         >
+                <div class="modalContent modalContentWait">
+                    <p >等待审批员审批</p>
+                </div>
+            </login-modal>
         </div>
-
+        <web-socket ref="websocket" @change="socketChange" v-show="false"></web-socket>
     </div>
 </template>
 <script>
@@ -193,19 +227,20 @@
         receiveCode,
         getRoleCode
     } from "@/api/index";
-    import {ssoLoginSend,loginWho,generateQRCode,CheckLogin} from "@/api/moduleIndex";
+    import {ssoLoginSend,loginWho,generateQRCode,CheckLogin,registAssessor} from "@/api/moduleIndex";
     import util from "@/libs/util.js";
     import loginModal from "../components/login/loginModal.vue";
-    import {isMobile, validatenull} from "@/libs/validate.js";
+    import {isMobile, validatenull,isCardId} from "@/libs/validate.js";
     import {pageReturn, runIndex} from '@/libs/tool'
     import inputUse from '../views/my-components/login/compontets/input-use'
     import QRCode from "qrcodejs2"
-
+    import webSocket from './home-index/webSocket.vue'
     export default {
         name: "login",
         components: {
             inputUse,
-            loginModal
+            loginModal,
+            webSocket
         },
         data() {
             const validateMobile = (rule, value, callback) => {
@@ -223,6 +258,8 @@
                 errorMsg: "",
                 loginModal: false,
                 loginModal1: false,
+                AssessorLogon:false,
+                assessorActive:false,
                 loginSuccess: true,
                 loginDownLoad: true,
                 qrMark: false,
@@ -252,16 +289,22 @@
                     mobile: "",
                     code: ""
                 },
+                formAssessor:{
+                    username: '',
+                    password:'',
+                    passwordAgain: '',
+                },
                 tips: {
-                    username: {tips: ['请正确输入用登录账号!', '请输入用登录账号']},
-                    password: {tips:['请正确输入APP动态码!', '请输入APP动态码'] },
+                    username: {tips: ['请正确输入登录账号!', '请输入登录账号']},
+                    password: {tips:['请正确输入APP动态码!', '请输入APP动态码', '请输入用户密码','请正确输入密码!'] },
+                    passwordAgain:{tips:['两次输入密码不一致', '请再次输入密码'] },
                     usernameAPP: [],
                     passwordApp: [],
                     codeAPP: {tips: ['请正确输入登录密码!', '请输入登录密码']},
                     usernameBusiness: {tips: ['请正确输入登录账号或手机号!', '请输入登录账号或手机号']},
                     passwordBusiness: {tips: ['请正确输入APP动态码!', 'APP动态码']},
                     codeBusiness: {tips: ['请正确输入短信验证码!', '短信验证码']},
-                    clockCode: ['您的验证码仍在有效期内', '您的验证码已失效']
+                    clockCode: ['您的验证码仍在有效期内', '您的验证码已失效'],
                 },
                 clockCode: '',
                 rules: {
@@ -315,6 +358,8 @@
             },
             loginModal1(val) {
 
+            },
+            AssessorLogon(val){
             },
             shuaShow(val) {
                 console.log(val)
@@ -473,14 +518,7 @@
                 this[item] = value;
 
             },
-            clearValue(item, value) {//清空修改值
-
-                //item=value
-                // if(item==1){
-                //     this.from.code=value
-                // }else if(item==2){
-                //     this.form2.code=value
-                // }
+            clearValue(item) {//清空对象值
 
 
             },
@@ -517,7 +555,6 @@
                     }
                 })
             },
-
             focusInput() {
             },
             electionClick(index) {
@@ -532,15 +569,14 @@
 
             },
             clockCount(item) {
-                console.log(item)
                 if (item) {
                     this.clockCode = this.tips.clockCode[1]
                 } else {
                     this.clockCode = this.tips.clockCode[0]
                 }
             },
-            buttonClick() {
-                if (this.openIndex == 0) {//登录校验
+            buttonClick() {//登录弹窗
+                if (this.openIndex == 0) {//登录方式// 校验
                     if (validatenull(this.form.username)) {
                         this.$refs.input1.isShow = true
                     }
@@ -548,12 +584,25 @@
                         this.$refs.input2.isShow = true
                     }
                     if (this.$refs.input1.isShow | this.$refs.input2.isShow) {
+
                     } else {
                         loginWho(this.form).then(res => {
+                    console.log(res)
                                 if (res.success) {
+                                    if(res.result.isRole=='other'){//其他情况
+                                      //  this.modalClick('AssessorLogon');
                                         this.modalClick('loginModal');
+                                    }else if(res.result.isRole=='adminN'){//没有有审批员情况下的管理员
+                                        this.modalClick('AssessorLogon');
+                                    }else if(res.result.isRole=='adminY'){//有审批员情况下的管理员：adminY
+                                        this.modalClick('assessorActive')
+                                        this.$refs.websocket.websocketInit(this.form.username)
+                                    }else if(res.result.isRole=='assessor'){
+                                        this.validateInput('form')
+                                    }
+
                                 }else {
-                                    this.$Message.error(res.msg);
+                                    this.$Message.error(res.message);
                                 }
                         })
                     }
@@ -707,6 +756,7 @@
                                 this.setStore("roles", roles);
                                 if (this.saveLogin) {
 // 保存7天
+                                    console.log(res.result)
                                     Cookies.set("userInfo", JSON.stringify(res.result), {
                                         expires: 7
                                     });
@@ -800,13 +850,40 @@
                     duration: 10
                 });
             },
+            registerAssess(){//登记注册审批员
+                if(validatenull(this.formAssessor.username)){
+                  this.$refs.input8.staticShow = true
+                }
+                if(validatenull(this.formAssessor.password)){
+                  this.$refs.input9.staticShow = true
+                }
+                if(validatenull(this.formAssessor.passwordAgain)){
+                    this.$refs.input10.staticShow= true
+                }else if(this.formAssessor.passwordAgain!==this.formAssessor.password){
+                    this.$refs.input10.staticShow= true
+                }
+                if(validatenull(this.formAssessor.username)|validatenull(this.formAssessor.password)|validatenull(this.formAssessor.passwordAgain)|this.formAssessor.passwordAgain!==this.formAssessor.password){
 
+                }else {
+                    registAssessor(this.formAssessor).then(res=>{
+                        if(res.success){
+                            this.$Message.success(res.message)
+                            this.AssessorLogon=false;
+                        }else {
+                            this.$Message.error(res.message)
+                        }
+                    })
+                }
+
+            },
+            socketChange(item){
+                console.log(item)
+            }//websocket 变化
         },
         mounted() {
             this.getRole();
             this.qrCode('qrIos', {'sss':'ssssss'}, 132, 132)
             this.qrCode('qrAndroid', {'sss':'ssssss'}, 132, 132)
-
         }
     }
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div class="input-div">
         <div v-if="isIcon=='people'">
-            <input class="login-input login-input1" type="text" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
+            <input class="login-input login-input1" :type="Type" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
                    @mouseleave="mouseLeave" v-model="value" :placeholder="placeholder">
             <span :class="{loginInputPic:!open,loginInputPic1:open,loginInputPic11:open1}" ></span>
             <div class="input-tips" v-if="verification">
@@ -9,7 +9,7 @@
             </div>
         </div>
         <div v-if="isIcon=='lock'">
-            <input class="login-input login-input1" type="text" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
+            <input class="login-input login-input1" :type=" Type" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"    :autocomplete="value"
                    @mouseleave="mouseLeave" v-model="value" :placeholder="placeholder">
             <span :class="{loginInputPic2:!open,loginInputPic3:open,loginInputPic33:open1}" ></span>
             <div class="input-tips" v-if="verification">
@@ -18,7 +18,7 @@
         </div>
         <div v-if="isIcon=='code'">
             <div class="code-box">
-                <input class="login-input login-input2" type="text" @focus="focusInput()"   @blur="blurInput()" v-model="value" :placeholder="placeholder">
+                <input class="login-input login-input2" :type="Type" @focus="focusInput()"   @blur="blurInput()" v-model="value" :placeholder="placeholder">
                 <span class="code" @click="sendCode">
                     <span>
                           <span v-if="!sending">获取验证码</span>
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div v-if="isIcon=='clock'" class="clock-box">
-            <input class="login-input login-input1 login-input-clock"  type="text" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
+            <input class="login-input login-input1 login-input-clock"  :type="Type" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
                    @mouseleave="mouseLeave" v-model="value" :placeholder="placeholder"  >
             <span :class="{loginInputPic4:!open,loginInputPic44:open,loginInputPic444:open1}" ></span>
             <span class="sendInput" :class="{sendInput1:open}" @click="sendCode">
@@ -45,9 +45,19 @@
 
         </div>
         <div v-if="isIcon=='dynamic'" class="clock-box">
-            <input class="login-input login-input1"  type="text" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
+            <input class="login-input login-input1"  :type=" Type" @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
                    @mouseleave="mouseLeave" v-model="value" :placeholder="placeholder"  >
             <span :class="{loginInputPic5:!open,loginInputPic55:open,loginInputPic555:open1}" ></span>
+        </div>
+        <div v-if="isIcon=='nomal'"  class="clock-box">
+            <div class="table-box">
+                <span class="table-child nomal-span" :style="{width:titleWidth}">{{title}}</span>
+                <input class="login-input login-input2 login-nomal table-child"  @focus="focusInput()"   @blur="blurInput()" @mouseover="mouseOver"
+                       @mouseleave="mouseLeave" v-model="value" :value="value" :placeholder="placeholder"  :autocomplete="value" :type="Type" >
+            </div>
+            <div class="input-tips" v-if="verification">
+                <tips-use :tips="tip" v-model="staticShow" :is-tip="staticShow"  ></tips-use>
+            </div>
         </div>
     </div>
 </template>
@@ -91,13 +101,26 @@
             tips:{
                 type:String,
                 default:'',
+            },
+            title:{
+                type:String,
+                default:'',
+            },
+            Type:{
+                type:String,
+                default:'text',
+            },
+            titleWidth:{
+                type:String,
+                default:'auto',
             }
         },
         data(){
             return{
                 tip:this.tips,
                 open:this.isOpen,
-                isShow:false,
+                isShow:false,//
+                staticShow:false,//
                 value:this.data,
                 open1:false,
                 countButton:'60s',
@@ -115,16 +138,21 @@
             },
             isShow(val){
                 if(val){
-                    this.timeOut()
+                    this.timeOut('isShow',2000)
+                }
+            },
+            staticShow(val){
+                if(val){
+                    this.timeOut('staticShow',3000)
                 }
             }
         },
         methods:{
-            timeOut(){
+            timeOut(item,time){
                 let  that=this
                 setTimeout(function() {
-                    that.isShow=false;
-                },2000);
+                    that[item]=false;
+                },time);
             },
             sendCode(){
                 this.sending=true;
@@ -176,7 +204,6 @@
         width: 100%;
         padding-right:110px;
     }
-
     .code{
         height: 50px;
         width: 100px;
@@ -223,8 +250,24 @@
         padding-left: 64px;
 
     }
+    .login-nomal{
+        min-width: 210px;
+    }
     .login-input-clock{
         padding-right: 76px;
+    }
+    .nomal-span{
+        text-align: right;
+    }
+    .table-box{
+        width: 100%;
+        display: table;
+        font-size: 21px;
+        .table-child{
+            display: table-cell;
+
+
+        }
     }
     .sendInput{
         display: inline-block;
