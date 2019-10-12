@@ -593,7 +593,7 @@ export const updateWarning = (params) => {
 }
 ///page_home 子系统跳转
 export const systemGet = (params) => {
-    return getRequest('/system/getAll',params)
+    return getRequest('/portalController/selectSystemPortal',params)
 }
 ///点击子系统进入的测试接口
 export const loginTest = (params) => {
@@ -665,6 +665,8 @@ export const callForm = (params) => {
 export const fullList = (params) => {
     return getRequest('/portalController/selectBacklogOrFullListByMap', params)
 }
+
+
 /**
  *name:nijianping/
  * time :20190711

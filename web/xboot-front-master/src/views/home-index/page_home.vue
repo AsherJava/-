@@ -28,7 +28,9 @@
                         <Card  class="Position">
                             <div class="Entrance flex">
                                 <span class="entranceSpan" :class="{spanTips1:index==0}"  v-for="(item ,index) in entrance" :key="index">
-                                    <div>
+                                    <div style="position: relative">
+                                         <Badge dot style="position: absolute;z-index: 10;right: 0" v-if="item.code=='todo'">
+                                          </Badge>
                                    <img style="width: 60px;height: 60px" @click="entranceClick(item.url)" :class="{img1:index==0}" :src="imgFormat(item.imageUrl)" alt="">
                                     <div class="span-tips" >
                                         {{item.sysName}}
@@ -856,6 +858,7 @@
             systemGet(){//快捷入口
                 systemGet().then(res=>{
                     if(res.code==200){
+      console.log(res)
                         this.entrance=res.result
                     }else {
                         this.$Message.error(res.message);

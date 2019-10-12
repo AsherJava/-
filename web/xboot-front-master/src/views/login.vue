@@ -589,7 +589,7 @@
                         loginWho(this.form).then(res => {
                     console.log(res)
                                 if (res.success) {
-                                    if(res.result.isRole=='other'){//其他情况
+                                    if(res.result.isRole=='other'){//其他情况 this.validateInput('form')旧的登录|res.result.isRole=='assessor'
                                       //  this.modalClick('AssessorLogon');
                                         this.modalClick('loginModal');
                                     }else if(res.result.isRole=='adminN'){//没有有审批员情况下的管理员
