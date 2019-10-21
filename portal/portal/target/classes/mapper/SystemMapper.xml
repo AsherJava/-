@@ -12,9 +12,19 @@
         </if>
         ORDER BY sort_order ASC
     </select>
-<!--protal查询出未被禁用的快捷入口-->
+<!--protal查询出未被禁用的快捷入口
     <select id="selectSystemPortal" resultType="cn.exrick.xboot.modules.system.entity.System"  parameterType="Map">
         SELECT * FROM t_system where status=0
         ORDER BY sort_order ASC
     </select>
+    -->
+
+    <!--protal查询出未被禁用的快捷入口,以及查询时查询待办列表表中是否有待办事项-->
+    <select id="selectSystemPortal" resultType="java.util.Map"  parameterType="Map">
+        SELECT   DISTINCT t_system.* , code
+        FROM t_system LEFT JOIN t_backlog_or_full_list
+        on  t_system.module_name = t_backlog_or_full_list.module_name   and  t_backlog_or_full_list.code = 'todo'
+		ORDER BY sort_order ASC
+    </select>
+
 </mapper>

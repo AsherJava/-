@@ -40,6 +40,38 @@
     .main .single-page-con .single-page{
         margin: 0px ;
     }
+    .assessContent{
+        font-size: 20px;
+        .assessContent-title{
+            text-align: center;
+            line-height: 30px;
+            padding: 40px 0 30px 0;
+            .content{
+                display: inline-block;
+                line-height: 30px;
+            }
+        }
+        .assessFooter{
+            padding-bottom: 10px;
+            .assessBut{
+                width: 100%;
+                display: flex;
+                .bord{
+                    border-left:1px solid rgba(220,222,227,1);
+                    border-right:1px solid rgba(220,222,227,1);
+                }
+                .assessChild{
+
+                    cursor: pointer;
+                    flex: 1;
+                    text-align: center;
+                    span{
+                        display: inline-block;
+                    }
+                }
+            }
+        }
+    }
 </style>
 <template>
     <div class="main" :class="{'main-hide-text': shrink}">
@@ -77,10 +109,11 @@
                                     <Avatar :src="avatarPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
                                 </a>
                                 <DropdownMenu slot="list">
-                                    <DropdownItem name="ownSpace">{{ $t('userCenter') }}</DropdownItem>
-                                    <DropdownItem name="ownSpaceOld">{{ $t('userCenterOld') }}</DropdownItem>
-                                    <DropdownItem name="changePass">{{ $t('changePass') }}</DropdownItem>
-                                    <DropdownItem name="loginout" divided>{{ $t('logout') }}</DropdownItem>
+                                    <!--<DropdownItem name="ownSpace">{{ $t('userCenter') }}</DropdownItem>-->
+                                    <!--<DropdownItem name="ownSpaceOld">{{ $t('userCenterOld') }}</DropdownItem>-->
+                                    <!--<DropdownItem name="changePass">{{ $t('changePass') }}</DropdownItem>-->
+                                    <DropdownItem name="assessorList" v-if="isRole=='assessor'">{{isRoleList}}</DropdownItem>
+                                    <DropdownItem name="loginout" >{{ $t('logout') }}</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                         </Row>
@@ -95,6 +128,31 @@
                 </keep-alive>
             </div>
         </div>
+        <loginModal  v-model="assessModal"
+                     :mask-closable="false"
+                     Width="650"
+        >
+         <div class="assessContent">
+             <div class="assessContent-title">
+                 <Icon type="ios-alert" size="30" color="#ed4014"/>
+                 <span class="content">管理员正在登录后台管理，是否批准？</span>
+             </div>
+             <div class="assessFooter">
+                 <div class="assessBut">
+                     <div class="assessChild">
+                         <span style="color:#1DAD5E" @click="assess(1)">通过</span>
+                     </div>
+                     <div class="assessChild bord">
+                         <span style="color:#7B7B7B" @click="assess(0)">暂不处理</span>
+                     </div>
+                     <div class="assessChild">
+                         <span style="color:#ed4014" @click="assess(2)">驳回</span>
+                     </div>
+                 </div>
+             </div>
+         </div>
+        </loginModal>
+        <web-socket ref="websocket" @change="socketChange" v-show="false"></web-socket>
     </div>
 </template>
 <script>
@@ -102,9 +160,11 @@
     import fullScreen from "./../main-components/fullscreen.vue";
     import lockScreen from "./../main-components/lockscreen/lockscreen.vue";
     import messageTip from "./../main-components/message-tip.vue";
+    import loginModal from "@/components/login/loginModal.vue";
     import Cookies from "js-cookie";
     import util from "@/libs/util.js";
-
+    import {insertOrUpdate} from  "@/api/moduleIndex.js";
+    import webSocket from '../home-index/webSocket.vue'
     export default {
         name:'home-pages',
         components: {
@@ -112,11 +172,15 @@
             fullScreen,
             lockScreen,
             messageTip,
+            loginModal,
+            webSocket
         },
         data() {
             return {
                 isIf:false,
                 shrink: false,
+                assessModal:false,
+                approvalId:'',
                 username: "",
                 userId: "",
                 isFullScreen: false,
@@ -124,6 +188,8 @@
                 lastNav: [],
                 navType: 1,
                 mesCount:0,
+                isRole:'',
+                isRoleList:'审批列表'
             };
         },
         computed: {
@@ -138,6 +204,7 @@
             },
         },
         created(){
+           this.isRole=this.getStore("isRole")
         },
         stompClient: {
             monitorIntervalTime: 100,
@@ -185,7 +252,12 @@
                     this.$router.push({
                         name: "change_pass"
                     });
-                } else if (name == "loginout") {
+                }else if(name=="assessorList"){
+                    console.log(name)
+                    this.$router.push({
+                        path: '/assessorList',
+                    });
+                }else if (name == "loginout") {
                     // 退出登录
                     this.$store.commit("logout", this);
                     this.$store.commit("clearOpenedSubmenu");
@@ -195,7 +267,34 @@
             },
             fullscreenChange(isFullScreen) {
                 // console.log(isFullScreen);
-            }
+            },
+            assess(Status){
+                let data= {
+                    id:this.approvalId,
+                    approvalStatus:Status,
+                }
+                this.assessModal=false;
+                if(Status==0){
+                    return
+                }
+                insertOrUpdate(data).then(res=>{
+                    if(res.success){
+                        this.$Message.success(res.message)
+                    }else {
+                        this.$Message.error(res.message)
+                    }
+                })
+            },
+            socketChange(item){
+                let data=item;
+                if(data.ApprovalUpdate){
+                    this.assessModal=true;
+                    this.approvalId=data.ApprovalInfo.id
+                }else {
+                    this.assessModal=false;
+                }
+
+            }//websocket 变化
         },
         watch: {
             $route(to) {
@@ -204,6 +303,12 @@
         },
         mounted() {
             this.init();
+            if(this.isRole=='assessor'){
+                if(Cookies.get("userInfo")){
+                    this.$refs.websocket.websocketInit(JSON.parse(Cookies.get("userInfo")).username)
+                }
+
+            }
         }
     };
 </script>

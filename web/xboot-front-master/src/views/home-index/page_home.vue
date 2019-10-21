@@ -858,7 +858,6 @@
             systemGet(){//快捷入口
                 systemGet().then(res=>{
                     if(res.code==200){
-      console.log(res)
                         this.entrance=res.result
                     }else {
                         this.$Message.error(res.message);

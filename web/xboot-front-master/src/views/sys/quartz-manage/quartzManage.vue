@@ -120,6 +120,7 @@ export default {
       submitLoading: false,
       selectList: [],
       selectCount: 0,
+
       columns: [
         {
           type: "selection",

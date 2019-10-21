@@ -7,6 +7,7 @@ export const homeRouter={
         { path: '/page_home', title: { i18n: 'page_home' }, name: 'page_home', component: () => import('@/views/home-index/page_home.vue') },
         { path: '/pages-news-detail', title: { i18n: 'pages-news-detail' }, name: 'pages_news_detail', component: () => import('@/views/home-index/detail/pages-news-detail.vue') },
         { path: '/webSocket', title: { i18n: 'webSocket' }, name: 'WebSocket', component: () => import('@/views/home-index/webSocket.vue') },
+        { path: '/assessorList', name: 'assessorList', title: { i18n: 'assessorList' }, component: () => import('@/views/home-index/assessor/assessorList.vue')}
     ],
     component: () => import('@/views/home-index/home-pages.vue')
 };

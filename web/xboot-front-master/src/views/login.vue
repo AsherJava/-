@@ -184,12 +184,6 @@
                             <input-use title="用户名称 ：" ref="input8" is-icon="nomal" v-model="formAssessor.username" :data.sync="formAssessor.username"
                                        :tips="tips.username.tips[0]"
                                         :placeholder="tips.username.tips[1]" ></input-use>
-                            <input-use title="用户密码 ："  Type="password" ref="input9" is-icon="nomal" v-model="formAssessor.password" :data.sync="formAssessor.password"
-                                       :tips="tips.password.tips[3]"
-                                        :placeholder="tips.password.tips[2]" ></input-use>
-                            <input-use title="重复密码 ："  Type="password" ref="input10" is-icon="nomal" v-model="formAssessor.passwordAgain" :data.sync="formAssessor.passwordAgain"
-                                       :tips="tips.passwordAgain.tips[0]"
-                                        :placeholder="tips.passwordAgain.tips[1]"></input-use>
                             </form>
                         </div>
                         <div>
@@ -204,7 +198,7 @@
                          Width="650"
                          >
                 <div class="modalContent modalContentWait">
-                    <p >等待审批员审批</p>
+                    <p >{{ContentWait}}</p>
                 </div>
             </login-modal>
         </div>
@@ -227,7 +221,7 @@
         receiveCode,
         getRoleCode
     } from "@/api/index";
-    import {ssoLoginSend,loginWho,generateQRCode,CheckLogin,registAssessor} from "@/api/moduleIndex";
+    import {ssoLoginSend,loginWho,generateQRCode,CheckLogin,registAssessor,submitApprovalInfo} from "@/api/moduleIndex";
     import util from "@/libs/util.js";
     import loginModal from "../components/login/loginModal.vue";
     import {isMobile, validatenull,isCardId} from "@/libs/validate.js";
@@ -262,6 +256,7 @@
                 assessorActive:false,
                 loginSuccess: true,
                 loginDownLoad: true,
+                ContentWait:'',
                 qrMark: false,
                 tokenUid:'',
                 flag: true,
@@ -271,6 +266,7 @@
                 loading: false,
                 maxLength: 6,
                 errorCode: "",
+
                 form: {
                     username: "test",
                     password: "123456",
@@ -291,8 +287,6 @@
                 },
                 formAssessor:{
                     username: '',
-                    password:'',
-                    passwordAgain: '',
                 },
                 tips: {
                     username: {tips: ['请正确输入登录账号!', '请输入登录账号']},
@@ -350,6 +344,12 @@
         created() {
         },
         watch: {
+            assessorActive(val){
+                if(val){
+                    this.ContentWait='等待审批员审批'
+                }
+
+            },
             loginModal(val) {
                 if (!val) {
                     //                    this.clearValue(1, '')
@@ -587,18 +587,21 @@
 
                     } else {
                         loginWho(this.form).then(res => {
-                    console.log(res)
+
                                 if (res.success) {
-                                    if(res.result.isRole=='other'){//其他情况 this.validateInput('form')旧的登录|res.result.isRole=='assessor'
+                                    this.setStore("isRole",res.result.isRole);
+                               //    return      this.validateInput('form')
+                                    if(res.result.isRole=='other'|res.result.isRole=='assessor'){//其他情况 this.validateInput('form')旧的登录|res.result.isRole=='assessor'
                                       //  this.modalClick('AssessorLogon');
                                         this.modalClick('loginModal');
                                     }else if(res.result.isRole=='adminN'){//没有有审批员情况下的管理员
                                         this.modalClick('AssessorLogon');
                                     }else if(res.result.isRole=='adminY'){//有审批员情况下的管理员：adminY
                                         this.modalClick('assessorActive')
-                                        this.$refs.websocket.websocketInit(this.form.username)
-                                    }else if(res.result.isRole=='assessor'){
-                                        this.validateInput('form')
+                                        this.submitApproval()
+
+                                    }else {
+                                        //this.validateInput('form')
                                     }
 
                                 }else {
@@ -813,7 +816,6 @@
                                             this.setStore("userInfo", res.result);
                                             this.$store.commit("setAvatarPath", res.result.avatar);
 // 加载菜单
-
                                             util.initRouter(this);
 
                                             this.$router.push({
@@ -854,15 +856,7 @@
                 if(validatenull(this.formAssessor.username)){
                   this.$refs.input8.staticShow = true
                 }
-                if(validatenull(this.formAssessor.password)){
-                  this.$refs.input9.staticShow = true
-                }
-                if(validatenull(this.formAssessor.passwordAgain)){
-                    this.$refs.input10.staticShow= true
-                }else if(this.formAssessor.passwordAgain!==this.formAssessor.password){
-                    this.$refs.input10.staticShow= true
-                }
-                if(validatenull(this.formAssessor.username)|validatenull(this.formAssessor.password)|validatenull(this.formAssessor.passwordAgain)|this.formAssessor.passwordAgain!==this.formAssessor.password){
+                if(validatenull(this.formAssessor.username)){
 
                 }else {
                     registAssessor(this.formAssessor).then(res=>{
@@ -876,8 +870,26 @@
                 }
 
             },
+            submitApproval(){
+                let str='name'+this.form.username+'time'+new  Date().getTime()+'random'+Math.random()*100
+                let data={adminCode:str}
+                submitApprovalInfo(data).then(res=>{
+                    if(res.success){
+                        this.$refs.websocket.websocketInit(str)///长连接
+                        this.$Message.success(res.message)
+                    }else {
+                        this.$Message.error(res.message)
+                    }
+                })
+            },
             socketChange(item){
-                console.log(item)
+                let data=item;
+                if(data.success){
+                    this.assessorActive=false;
+                    this.validateInput('form')
+                }else {
+                    this.ContentWait=data.message;
+                }
             }//websocket 变化
         },
         mounted() {

@@ -6,34 +6,48 @@
     <select id="selectApprovalInfo"
             resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
         SELECT * FROM `t_approval_info` t where 1=1
-        /*身份证号*/
-        <if test='userCode!=null and userCode.trim()!=""'>
-            and user_code =  #{userCode ,jdbcType=VARCHAR}
+        /*审批状态*/
+        <if test='approvalInfo.approvalStatus!=null'>
+            and  t.approval_status =  #{approvalInfo.approvalStatus}
         </if>
-        /*提交人姓名*/
-        <if test='name!=null and name.trim()!=""'>
-            and  t.name =  #{name ,jdbcType=VARCHAR}
+        /*审批信息过期时间*/
+        <if test='approvalInfo.expirationTime!=null'>
+            and  t.expiration_time =  #{approvalInfo.expirationTime}
         </if>
-        /*描述*/
-        <if test='description!=null and description.trim()!=""'>
-            and  t.description   like CONCAT('%', #{description ,jdbcType=VARCHAR}, '%')
+
+        /*大于当前时间未过期的审批数据也就是待审批数据*/
+        <if test='approvalInfo.nowTime!=null'>
+            and  t.expiration_time >  #{approvalInfo.nowTime}
         </if>
+        ORDER BY create_time DESC
+    </select>
+
+
+    <!--查询当前过期时间小于当前时间的各个状态的数据-->
+    <select id="selectApprovalInfoByAgo"
+            resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
+        SELECT * FROM `t_approval_info` t where 1=1
         /*审批状态*/
         <if test='approvalStatus!=null'>
             and  t.approval_status =  #{approvalStatus}
         </if>
-        /*审批信息过期时间*/
-        <if test='expirationTime!=null'>
-            and  t.expiration_time =  #{expirationTime}
+        /*大于当前时间未过期的审批数据也就是待审批数据*/
+        <if test='nowTime!=null'>
+            and     #{nowTime} > t.expiration_time
         </if>
-
-        /*审批员姓名*/
-        <if test='assessor_username!=null and description.trim()!=""'>
-            and  t.assessor_username   =#{assessor_username ,jdbcType=VARCHAR}
+        ORDER BY create_time DESC
+    </select>
+    <!--查询待审批最新的一条数据-->
+    <select id="selectApprovalInfoByAgo"
+            resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
+        SELECT * FROM `t_approval_info` t where 1=1
+        /*审批状态*/
+        <if test='approvalStatus!=null'>
+            and  t.approval_status =  #{approvalStatus}
         </if>
         /*大于当前时间未过期的审批数据也就是待审批数据*/
         <if test='nowTime!=null'>
-            and  t.expiration_time >  #{nowTime}
+            and     #{nowTime} > t.expiration_time
         </if>
         ORDER BY create_time DESC
     </select>
@@ -43,26 +57,11 @@
     <select id="approvalInfoFuzzyQuery"
             resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
         SELECT * FROM `t_approval_info` t where 1=1
-        /*身份证号*/
-        <if test='userCode!=null and userCode.trim()!=""'>
-            and user_code like CONCAT('%', #{userCode ,jdbcType=VARCHAR}, '%')
-        </if>
-        /*提交人姓名*/
-        <if test='name!=null and name.trim()!=""'>
-            and  t.name like CONCAT('%', #{name ,jdbcType=VARCHAR}, '%')
-        </if>
-        /*描述*/
-        <if test='description!=null and description.trim()!=""'>
-            and  t.description   like CONCAT('%', #{description ,jdbcType=VARCHAR}, '%')
-        </if>
         /*审批状态*/
         <if test='approvalStatus!=null'>
             and  t.approval_status =  #{approvalStatus}
         </if>
-        /*审批员姓名*/
-        <if test='assessor_username!=null and description.trim()!=""'>
-            and  t.assessor_username   like CONCAT('%', #{assessor_username ,jdbcType=VARCHAR}, '%')
-        </if>
+
         /*大于当前时间未过期的审批数据也就是待审批数据*/
         <if test='nowTime!=null'>
             and  t.expiration_time >  #{nowTime}

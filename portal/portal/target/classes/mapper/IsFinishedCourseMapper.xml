@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.exrick.xboot.modules.IsFinishedCourse.dao.mapper.IsFinishedCourseMapper">
+    <select id="selectInfoId"
+            resultType="java.lang.String" parameterType="Map">
+            select messageid from t_is_finished_course
+            where messageid = #{ mapId.messageId } and user_code = #{ mapId.userCode }
+
+    </select>
+
+    <update id="UpdateMseeageType" parameterType="Map">
+            update t_is_finished_course
+            set code = #{ map.code }
+            where  messageid = #{ map.messageId } and user_code = #{ map.userCode }
+    </update>
+</mapper>

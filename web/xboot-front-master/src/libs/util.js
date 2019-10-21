@@ -1,13 +1,20 @@
 import axios from 'axios';
 import { getMenuList } from '@/api/index';
 import lazyLoading from './lazyLoading.js';
-import router from '@/router/index';
+import {router} from '@/router/index';
 import Cookies from "js-cookie";
 
 let util = {
 
 };
+util.addRouterObj=function(a=[]){
+    if(Array.isArray(a)){
+        router.addRoutes(a)
+    }else if(typeof a=='object'){
+        router.addRoutes([a])
+    }
 
+};
 util.title = function (title) {
     title = title || '湖南交建';
     window.document.title = title;

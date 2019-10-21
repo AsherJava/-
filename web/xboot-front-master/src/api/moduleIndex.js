@@ -42,6 +42,16 @@ export const generateQRCode = (params)=>{
 export const CheckLogin = (params)=>{
     return   poJson('/qrcode/qrcodeCheckLogin', params)
 }
-export const registAssessor = (params)=>{
+export const registAssessor = (params)=>{//注册审批员
     return  postRequest('/role/registAssessor', params)
 }
+export const  insertOrUpdate=(params)=>{//审批员审批接口
+    return postRequest('/approvalInfo/insertOrUpdate',params)
+}
+export const  insertSelectAll=(params)=>{//获取审批数据列表按时间倒序排列
+    return getRequest('/approvalInfo/selectAll',params)
+}
+export const  submitApprovalInfo=(params)=>{//提交审批接口(adminCode: admin +唯一标识)eg:admin+UUID
+    return postRequest('/approvalInfo/submitApprovalInfo',params)
+}
+

@@ -3,6 +3,10 @@ jasypt:
   encryptor:
     password: xboot
 
+security:
+  basic:
+    enabled: false
+
 server:
   port: 8899
   servlet:
@@ -13,6 +17,8 @@ server:
     min-spare-threads: 30
 
 spring:
+  profiles:
+    active: resources
   # 数据源
   datasource:
     url: jdbc:mysql://10.2.24.14:3306/xboot?useUnicode=true&characterEncoding=utf-8&useSSL=false
@@ -109,6 +115,10 @@ xboot:
   # 日志记录方式 true使用Elasticsearch记录 false记录至数据库中
   logRecord:
     es: false
+    #控制对超级管理员的接口限制  true：开启控制器  false关闭控制器
+  #AdminIntercept:
+   # flag: true
+
   # 七牛云配置
   qiniu:
     accessKey: 你的accessKey
@@ -195,3 +205,6 @@ logging:
 jiGuangPush:
   appKey: 076313340ce35cdc05d7265f
   masterSecret: 1a7382474bbda36da40cc4b1
+
+
+

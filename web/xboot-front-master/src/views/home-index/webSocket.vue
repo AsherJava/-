@@ -13,6 +13,12 @@
 
     export default {
         name: "WebSocket",
+        props:{
+            isWebSocket:{
+                type: Boolean,
+                default:false,
+            }
+        },
         components: {
 
         },
@@ -21,6 +27,7 @@
                 text: '',
                 data: '',
                 websocket: null,
+               open:this.isWebSocket
             }
         },
       watch:{
@@ -29,14 +36,12 @@
       },
         mounted() {
             let userInfo =Cookies.get("userInfo");
-               if(userInfo){
-                   if ('WebSocket' in window) {
-                       this.websocket = new WebSocket('ws://10.1.13.14:8899/websocket/'+ JSON.parse(userInfo).username)
-                       this.initWebSocket()
-                   } else {
-                       alert('当前浏览器不支持websocket,请升级浏览器')
-                   }
-               }
+            if(this.open){
+                if(userInfo){
+                    this.websocketInit(JSON.parse(userInfo).username)
+                }
+            }
+
 
 
         },

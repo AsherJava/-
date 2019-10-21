@@ -76,8 +76,6 @@ export default {
                 willpush = false;
             }
             if (willpush) {
-                console.log(name)
-                console.log(this.$router)
                 this.$router.push({
                     name: name
                 });
@@ -86,7 +84,7 @@ export default {
         }
     },
     mounted() {
-       console.log(this.menuList)
+
     }
 };
 </script>

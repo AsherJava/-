@@ -172,11 +172,22 @@
 
 <script>
     import infoCard from "./components/infoCard.vue";
+    import {getStore} from '@/libs/storage.js'
+    import {pageReturn} from '@/libs/tool'
     import Cookies from "js-cookie";
     export default {
         name: "home",
         components: {
             infoCard
+        },
+        beforeRouteEnter:(to,from,next)=>{//局部路守卫l
+
+            if(pageReturn(getStore("roles"))=='home_index'){
+                next()
+            }else {
+                next('/'+pageReturn(getStore("roles")))
+            }
+
         },
         data() {
             return {
