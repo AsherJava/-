@@ -33,8 +33,8 @@
     <select id="selectBacklogOrFullListByMap"
             resultType="cn.exrick.xboot.modules.backlogOrFullList.entity.BacklogOrFullList" parameterType="Map">
         /*SELECT * FROM `t_backlog_or_full_list` where 1=1*/
-        SELECT * FROM `t_backlog_or_full_list` b left JOIN t_dict_data d on b.module_name=d.title where 1=1
-
+  /*      SELECT * FROM `t_backlog_or_full_list` b left JOIN t_dict_data d on b.module_name=d.title where 1=1*/
+        SELECT * FROM `t_backlog_or_full_list` b left JOIN t_dict_data d on b.module_name=d.title where dict_id='2019082911'
         <if test='map.backlogOrFullList.userCode!=null and map.backlogOrFullList.userCode.trim()!=""'>
             and user_code =#{map.backlogOrFullList.userCode,jdbcType=VARCHAR}
         </if>
@@ -77,6 +77,15 @@
             set code = #{ map.code }
             where  info_id = #{ map.infoId } and user_code = #{ map.userCode }
     </update>
+
+
+
+    <select id="selectBacklogOrFullListAPP"
+            resultType="cn.exrick.xboot.modules.backlogOrFullList.entity.APPBacklogOrFullList" >
+      select d.title ,d.value, Count(b.module_name) AS infoNum, d.description  from t_dict_data d,t_backlog_or_full_list b where b.module_name=d.title and d.dict_id='199323417499930624' and b.code='todo' and b.user_code=#{userCode}
+      Group By d.title
+    </select>
+
 
 
 </mapper>

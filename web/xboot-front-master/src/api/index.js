@@ -13,6 +13,7 @@ export const getMenuList = "/xboot/permission/getMenuList"
 export const getDictData = "/xboot/dictData/getByType/"
 // 图片上传接口
 export const NewUpload = "/xboot/news/newUpload"
+export const systemUpload = "/xboot/system/Upload"
 // 登陆
 export const login = (params) => {
     return postRequest('/login', params)

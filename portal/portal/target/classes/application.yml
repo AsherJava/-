@@ -146,6 +146,7 @@ ignored:
   - /xboot/common/**
   - /druid/**
   - /swagger-ui.html
+  - /doc.html
   - /swagger-resources/**
   - /swagger/**
   - /**/v2/api-docs
@@ -175,14 +176,14 @@ ignored:
 
 # Swagger界面内容配置
 swagger:
-  title: XBoot API接口文档
-  description: XBoot Api Documentation
+  title: 湖南交水建 API接口文档
+  description: Api Documentation
   version: 1.0.0
-  termsOfServiceUrl: http://blog.exrick.cn
+  termsOfServiceUrl:
   contact:
-    name: Exrick
-    url: http://blog.exrick.cn
-    email: 1012139570@qq.com
+    name: 久其金建研发三部
+    url:
+    email:
 
 # Mybatis-plus
 mybatis-plus:

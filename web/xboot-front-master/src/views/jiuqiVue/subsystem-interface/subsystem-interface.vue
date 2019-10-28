@@ -89,9 +89,23 @@
                 <FormItem label="备注" prop="description">
                     <Input v-model="editSubsystemNews.description"  placeholder="请输入..."/>
                 </FormItem>
-                <FormItem label="图片地址" prop="description">
-                    <Input v-model="editSubsystemNews.imageUrl"  placeholder="url"/>
+
+                <FormItem label="数据类型" prop="infoType">
+                    <Select  v-model="editSubsystemNews.infoType" placeholder="请选择" >
+                        <Option   value="portal" key="portal">
+                           pc端
+                        </Option>
+                        <Option   value="APP" key="APP">
+                            APP
+                        </Option>
+                    </Select>
                 </FormItem>
+
+             <!--   <FormItem label="图片地址" prop="description">
+                    <Input v-model="editSubsystemNews.imageUrl"  placeholder="url"/>
+                </FormItem>-->
+
+
                 <FormItem label="排序值" prop="sortOrder">
                     <InputNumber :max="1000" :min=0 v-model="editSubsystemNews.sortOrder"></InputNumber>
                     <span style="margin-left:5px">值越小越靠前，支持小数</span>
@@ -166,6 +180,7 @@
 
             <Form ref="newXQ" :model="newXQ" :label-width="80" :rules="sysFormValidate">
                 <FormItem label="系统名称" prop="name">
+                    <input v-model="newXQ.imageUrl"  type="hidden" />
                     <input  v-model="newXQ.id" type="hidden" />
                     <Input  v-model="newXQ.sysName" placeholder="标题" />
                 </FormItem>
@@ -175,9 +190,19 @@
                 <FormItem label="备注" prop="description">
                     <Input v-model="newXQ.description"  placeholder="描述" />
                 </FormItem>
-                <FormItem label="图片地址" prop="description">
+               <!-- <FormItem label="图片地址" prop="description">
                     <Input v-model="newXQ.imageUrl"  placeholder="url" />
+                </FormItem>-->
+
+             <!--   <Form-item label="新闻主图" prop="avatar">
+
+                    <SystemUploadPicInput @func="getMsgFormSon" ></SystemUploadPicInput>
+
+                </Form-item>-->
+                <FormItem label="图标上传" prop="description">
+                    <systemUploadPicInput @func="getMsgFormSon"></systemUploadPicInput>
                 </FormItem>
+
                 <FormItem label="排序值" prop="sortOrder">
                     <InputNumber :max="1000" :min=0 v-model="newXQ.sortOrder"></InputNumber>
                     <span style="margin-left:5px">值越小越靠前，支持小数</span>
@@ -231,16 +256,16 @@
     import util from "@/libs/util.js";
     import circleLoading from "@/views/my-components/circle-loading.vue";
     import textarea from "@/views/jiuqiVue/myTemplate/textarea.vue";
-
-    import MyUploadPicInput from "@/views/my-components/xboot/MyUploadPicInput";
+    import systemUploadPicInput from "@/views/jiuqiVue/myTemplate/systemUploadPicInput.vue";
+    //import MyUploadPicInput from "@/views/my-components/xboot/MyUploadPicInput";
     // import  uploadPicInput from "";
     export default {
         name: "subsystem-interface",
         components: {
             circleLoading,
             textarea,
-
-            MyUploadPicInput
+            systemUploadPicInput,
+           // MyUploadPicInput
         },
         data() {
             return {
@@ -292,6 +317,7 @@
                     url: "",
                     description: "",
                     sortOrder: 0,
+                    infoType: "",
                 },
 
                 editSubsystemNewsValidate: {
@@ -422,6 +448,12 @@
                     {
                         title: "更新时间",
                         key: "updateTime",
+                        width: 160,
+
+                    },
+                    {
+                        title: "数据类型",
+                        key: "infoType",
                         width: 160,
 
                     },
@@ -583,11 +615,10 @@
             },
             //njp add 20190717 父组件接收子组件信息的方法 begin
             getMsgFormSon(data){
-
-                this.newImage=data;
+                this.newXQ.imageUrl=data.imageUrl;
                 //njp 将回传的图片id赋值，并在提交后台
-                this.newForm.imageId=this.newImage.id;
-
+                //this.newForm.imageId=this.newImage.id;
+               /* alert(this.newXQ.imageUrl);*/
             },
             //njp 20190717 父组件接收子组件信息的方法 end
             showEditor() {

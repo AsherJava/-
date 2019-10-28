@@ -35,12 +35,12 @@
         </Row>
         <!-- 添加 -->
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
-            <Form ref="newForm" :model="newForm" :label-width="80" :rules="newFormValidate">
-                <FormItem label="新闻标题" prop="newsTitle">
-                    <Input v-model="newForm.newsTitle" placeholder="标题"/>
+                    <Form ref="newForm" :model="newForm" :label-width="80" :rules="newFormValidate">
+                        <FormItem label="新闻标题" prop="newsTitle">
+                            <Input v-model="newForm.newsTitle" placeholder="标题"/>
 
-                </FormItem>
-                <FormItem label="新闻描述" prop="newsDesc">
+                        </FormItem>
+                        <FormItem label="新闻描述" prop="newsDesc">
                     <Input v-model="newForm.newsDesc"  placeholder="描述"/>
 
                 </FormItem>
@@ -636,11 +636,9 @@
             },
             //njp add 20190717 父组件接收子组件信息的方法 begin
             getMsgFormSon(data){
-
                 this.newImage=data;
                 //njp 将回传的图片id赋值，并在提交后台
                 this.newForm.imageId=this.newImage.id;
-
             },
             //njp 20190717 父组件接收子组件信息的方法 end
             showEditor() {
