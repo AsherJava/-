@@ -828,7 +828,7 @@ export default {
                 this.userModalVisible = false;
               }
             });
-          } else {
+    } else {
             // 编辑
             this.submitLoading = true;
             editUser(this.userForm).then(res => {

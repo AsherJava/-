@@ -39,11 +39,16 @@ export function pageReturn(roles){//页面类型返回  返回路由name
     let [code]=JSON.parse(roles)
     let roleCode=JSON.parse(getStore('roleCodeList'));
     let data;
-    roleCode.forEach(function (item) {
-        if(code==item.name){//添加字段后修改
-            data=item.route
-        }
-    })
+    if( roleCode){
+        roleCode.forEach(function (item) {
+            if(code==item.name){//添加字段后修改
+                data=item.route
+            }
+        })
+    }else {
+        data='login'
+    }
+
       return data
 }
 export function pageRouter(roles){//页面类型返回  返回路由name

@@ -21,7 +21,7 @@ export const login = (params) => {
 export const sendCode = (params) => {
     return postRequest('/user/sendcode', params)
 
-}//1   用户登录
+}//1   用户登录企业微信
 export const receiveCode = (params) => {
     return postRequest('/login/code', params)
 }//企业微信登录验证
@@ -415,7 +415,7 @@ export const editSystem = (params) => {
 }
 //分页获取新闻信息
 export const getNews = (params) => {
-    return getRequest('/news/getByPage', params)
+    return getRequest('/news/getNewsByPage', params)
 }
 //添加新闻
 export const addNews = (params) => {

@@ -3,7 +3,7 @@
 <mapper namespace="cn.exrick.xboot.modules.subsystemNews.dao.mapper.SubsystemNewsMapper">
     <select id="selectPageVo" resultType="cn.exrick.xboot.modules.subsystemNews.entity.SubsystemNews">
 
-      SELECT * FROM t_subsystem_news where 1=1
+      SELECT * FROM t_notice_total where 1=1
         <if test="title !=null">
             and title like CONCAT('%', #{title ,jdbcType=VARCHAR}, '%')
 
@@ -17,7 +17,7 @@
 <!--新闻子系统的条件查新-->
     <select id="selectPageVoMap" resultType="cn.exrick.xboot.modules.subsystemNews.entity.SubsystemNews"  parameterType="Map">
 
-        SELECT * FROM t_subsystem_news where  code='1'
+        SELECT * FROM t_notice_total where  code='1'
         <if test="map.title !=null">
             and title like CONCAT('%', #{map.title}, '%')
         </if>
@@ -34,7 +34,7 @@
 
     <!--新闻子系统的条件查新-->
     <select id="selectNewsByNum" resultType="cn.exrick.xboot.modules.subsystemNews.entity.SubsystemNews"  parameterType="Map">
-        SELECT * FROM `t_subsystem_news` T WHERE T.code=1
+        SELECT * FROM t_notice_total T WHERE T.code=1
         <if test="map.department !=null">
             and department=#{map.department}
         </if>
@@ -52,7 +52,7 @@
     <!--公告子系统的条件查新-->
     <select id="selectNoticePageVoMap" resultType="cn.exrick.xboot.modules.subsystemNews.entity.SubsystemNews"  parameterType="Map">
 
-        SELECT * FROM t_subsystem_news where  code='2'
+        SELECT * FROM t_notice_total
         <if test="map.title !=null">
             and title like CONCAT('%', #{map.title}, '%')
         </if>
@@ -67,7 +67,7 @@
     <!--公告子系统的portal数据查询接口-->
     <select id="selectNoticePortal" resultType="cn.exrick.xboot.modules.subsystemNews.entity.SubsystemNews"  parameterType="Map">
 
-        SELECT * FROM t_subsystem_news where  code='2'
+        SELECT * FROM t_notice_total where  code='2'
 
         <if test="map.department !=null">
             and department=#{map.department}

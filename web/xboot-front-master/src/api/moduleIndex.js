@@ -54,4 +54,10 @@ export const  insertSelectAll=(params)=>{//获取审批数据列表按时间倒�
 export const  submitApprovalInfo=(params)=>{//提交审批接口(adminCode: admin +唯一标识)eg:admin+UUID
     return postRequest('/approvalInfo/submitApprovalInfo',params)
 }
-
+export const subsystemNews=(params)=>{//通过id获取公文详情
+    return getRequest('/subsystemNews/getById',params)
+}
+export const getInformation=(params)=>{//portal通过id获取子系统新消息通知（本地数据： "infoCode": "1",  异构数据： "infoCode": "0",）
+    return getRequest('/information/getById',params)
+}
+//

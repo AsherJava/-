@@ -113,10 +113,16 @@
             titleWidth:{
                 type:String,
                 default:'auto',
+            },
+            userSend:{
+                type:Boolean,
+                default:true,
             }
         },
         data(){
             return{
+                stop:false,
+                isSend:this.userSend,
                 tip:this.tips,
                 open:this.isOpen,
                 isShow:false,//
@@ -155,13 +161,11 @@
                 },time);
             },
             sendCode(){
+                if(this.isSend){
                 this.sending=true;
                 this.countDown()
-                this.$emit('changeCode',true)
-            },
-            countDown() {
-                let that = this;
-                if (this.count == 0) {
+
+                }else {
                     if(!this.sended){
                         this.sended=true;
                         this.$emit('countPlus',this.sended);
@@ -169,6 +173,17 @@
                     this.sending = false;
                     this.count = 60;
                     this.countButton=60+'s';
+                }
+                this.$emit('changeCode',true)
+            },
+            startSend(){
+                this.sending=true;
+                this.countDown()
+            },
+            countDown() {
+                let that = this;
+                if (this.count == 0) {
+                    this.stopChange()
                     return;
                 } else {
                     if(this.sended){
@@ -178,9 +193,26 @@
                     this.countButton = this.count + " s";
                     this.count--;
                 }
+
+                if(this.stop){
+                    console.log(this.stop)
+                    this.stopChange()
+                    this.stop=!this.stop;
+                    return  ;
+                }
                 setTimeout(function() {
                     that.countDown();
                 }, 1000);
+
+            },
+            stopChange(){
+                if(!this.sended){
+                    this.sended=true;
+                    this.$emit('countPlus',this.sended);
+                }
+                this.sending = false;
+                this.count = 60;
+                this.countButton=60+'s';
             },
             focusInput(){
                 this.open=true;

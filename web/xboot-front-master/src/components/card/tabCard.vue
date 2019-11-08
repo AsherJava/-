@@ -99,7 +99,7 @@
                 this.$emit('refresh',true)
             },
             buttonOpen(){//触发事件 默认更多
-                this.$emit('Open',true)
+                this.$emit('Open',{index:this.cardLine},true)
             },
         }
     }

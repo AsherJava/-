@@ -4,7 +4,7 @@
 
     <!--待办已办查询getALL(),排序asc-->
     <select id="selectAllBacklogOrFull" resultType="cn.exrick.xboot.modules.backlogOrFull.entity.BacklogOrFull"  >
-      SELECT * FROM `t_backlog_or_full`  ORDER BY sort_order ASC
+      SELECT * FROM t_backlog_or_full  ORDER BY sort_order ASC
     </select>
 
 </mapper>

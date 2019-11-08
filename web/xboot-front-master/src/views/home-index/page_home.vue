@@ -31,7 +31,7 @@
                                     <div style="position: relative">
                                          <Badge dot style="position: absolute;z-index: 10;right: 0" v-if="item.code=='todo'">
                                           </Badge>
-                                   <img style="width: 60px;height: 60px" @click="entranceClick(item.url)" :class="{img1:index==0}" :src="imgFormat(item.imageUrl)" alt="">
+                                   <img style="width: 60px;height: 60px" @click="entranceClick(item.url)" :class="{img1:index==0}" :src="item.imageUrl" alt="">
                                     <div class="span-tips" >
                                         {{item.sysName}}
                                     </div>
@@ -54,13 +54,14 @@
                                 <div class="new-child wh1 hg">
                                     <div class="pic-img">
                                         <div  class="new-child-img">
-                                            <horse-light @onChange="carouselChange" ref="carouse"></horse-light>
+                                            <horse-light @onChange="carouselChange" ref="carouse" :data-list="News"></horse-light>
                                         </div>
                                         <!--<img class="new-child-img" :src="isTipNews(tipsNews.imgUrl)" alt="">-->
                                         <div class="new-content new-content1">
                                             <div @mouseover="$refs.carouse.moveClear()" @mouseleave="$refs.carouse.move()">
                                                 <p class="flex maC wh1 " :ref="'p'+index" v-for="(item ,index) in News" :key="index" v-if="index<8">
-                                                    <a class="flex-a " href="javascript:void(0);" :class="{lightNews:carouselValue==index}"  @mouseover="$refs.carouse.Index=index"   @click="localClick(item.infoCode=='1',item.url,item.id,item.newsId)">
+                                                    <a class="flex-a " href="javascript:void(0);" :class="{lightNews:carouselValue==index}"  @mouseover="$refs.carouse.Index=index"
+                                                       @click="localClick(item.infoCode=='1',item.url,item.id,item.infoId)">
                                                          <span class="new-icon new-icon-span">
                                                              <span class="word">
                                                               {{index+1}}
@@ -92,8 +93,8 @@
                                                <span>更多</span>
                                         </span>
                                     </p>
-                                    <p class="wh1 flex maC Position span-message" :id="`list${index}`" v-for="(item,index) in notice.result" :key="index">
-                                        <a target="_blank" :href="item.url">
+                                    <p class="wh1 flex maC Position span-message" :id="`list${index}`" v-for="(item,index) in notice.result" :key="index" v-if="index<7">
+                                        <a  href="javascript:void(0);"   @click="noticeLocalClick(item.infoCode=='1',item.url,item.id,item.infoId)">
                                             <span class="dian"></span>
                                             <span class=" span-Eli  Ellipsis" v-model="WidthMes" :style="{width:WidthMes+'px'}">
                                             {{item.title}}
@@ -116,8 +117,8 @@
                                             <span>更多</span>
                                         </span>
                                     </p>
-                                    <p class="wh1 flex maC Position span-message" :id="`li${index}`" v-for="(item,index) in selectNotice.result" :key="index" >
-                                        <a target="_blank" :href="item.url">
+                                    <p class="wh1 flex maC Position span-message" :id="`li${index}`" v-for="(item,index) in selectNotice.result" :key="index" v-if="index<7">
+                                        <a href="javascript:void(0);"   @click="SelectLocalClick(item.infoCode=='1',item.url,item.id,item.infoId)">
                                             <span class="dian"></span>
                                             <span class=" span-Eli  Ellipsis" v-model="WidthMes" :style="{width:WidthMes+'px'}">
                                             {{item.title}}
@@ -144,7 +145,7 @@
                                         </span>
                                     </p>
                                     <p class="wh1 flex maC Position span-message" :id="`lis${index}`" v-for="(item,index) in WarningNews" :key="index" >
-                                        <a href="javascript:void(0);" target="_blank" @click="warningNewsClick(item.functionName)" >
+                                        <a href="javascript:void(0);" target="_blank" @click="warningNewsClick(item)" >
                                             <span class="dian"></span>
                                             <span class=" span-Eli  Ellipsis" v-model="WidthMes" :style="{width:WidthMes+'px'}">
                                                {{item.warningName}}
@@ -162,15 +163,15 @@
                         <Row>
                             <div class=" pl12 pr12 pb12">
                                 <Card class="Position paC my-card1">
-                                    <tab-card Title="OA平台"  Height="305"  @open="">
+                                    <tab-card Title="OA平台"  Height="305" ref="tabCardOa"  @Open="tabCardClick({index:$refs.tabCardOa.cardLine,url:cardOa,url1:cardOa1})">
                                         <div slot="content1"  ref="list1">
                                             <div class="message-content flex-a"
                                                  v-for="(item,index) in cardOa"
                                                  :key="index" v-if="index<5"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })"
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                infoID:item.infoId })"
                                             >
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
@@ -184,13 +185,13 @@
                                         </div>
                                         <div slot="content0">
                                             <div class="message-content flex-a"
-                                                 v-for="(item,index) in cardOa"
+                                                 v-for="(item,index) in cardOa1"
                                                  :key="index"
                                                  v-if="index<5"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })">
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                 infoID:item.infoId })">
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
 
                                                     <span class="dian dian-black"></span>
@@ -198,7 +199,7 @@
                                                     {{item.title}}
                                                     </span>
                                                     <span class="message-name">{{item.name}}</span>
-                                                    <span class="message-timer">{{ dateFormat(item.createTime)}}</span>
+                                                    <span class="message-timer">{{ dateFormat(item.updateTime)}}</span>
 
                                                 </p>
                                             </div>
@@ -212,13 +213,13 @@
                         <Row>
                             <div class="pr12 pb12">
                                 <Card class="Position paC my-card1">
-                                    <tab-card Title="HR平台"  Height="305"  @open="">
+                                    <tab-card Title="HR平台"  Height="305" ref="tabCardHr"  @Open="tabCardClick({index:$refs.tabCardHr.cardLine,url:cardHr,url1:cardHr1})">
                                         <div slot="content1"  ref="list1">
                                             <div class="message-content flex-a" v-for="(item,index) in cardHr" :key="index" v-if="index<5"
-                                                 @click="fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })">
+                                                 @click=" fromSummit(item.value,{
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                 infoID:item.infoId })">
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
                                                     <span class=" span-Eli  Ellipsis" v-model="cardWidth" :style="{width:cardWidth+'px'}">
@@ -233,9 +234,9 @@
                                         <div slot="content0">
                                             <div class="message-content flex-a" v-for="(item,index) in cardHr1" :key="index" v-if="index<5"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })"
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                 infoID:item.infoId })"
                                             >
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
@@ -243,7 +244,7 @@
                                                     {{item.title}}
                                                     </span>
                                                     <!--<span class="message-name">{{item.name}}</span>-->
-                                                    <span class="message-timer">{{ dateFormat(item.createTime)}}</span>
+                                                    <span class="message-timer">{{ dateFormat(item.updateTime)}}</span>
 
                                                 </p>
                                             </div>
@@ -280,29 +281,29 @@
                         <Row>
                             <div class="pl12 pr12 pb12">
                                 <Card class="Position paC my-card1">
-                                    <tab-card Title="财务管理平台"  Height="305"  @open="">
+                                    <tab-card Title="财务管理平台"  Height="305" ref="tabCardCai"  @Open="tabCardClick({index:$refs.tabCardCai.cardLine,url:cardCai,url1:cardCai1})">
                                         <div slot="content1"  ref="list1">
                                             <div class="message-content flex-a" v-for="(item,index) in cardCai" :key="index"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })">
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                 infoID:item.infoId})">
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
                                                     <span class=" span-Eli  Ellipsis" v-model="cardWidth" :style="{width:cardWidth+'px'}">
                                                     {{item.title}}
                                                     </span>
                                                     <span class="message-name">{{item.name}}</span>
-                                                    <span class="message-timer">{{ dateFormat(item.createTime)}}</span>
+                                                    <span class="message-timer">{{ dateFormat(item.updateTime)}}</span>
                                                 </p>
                                             </div>
                                         </div>
                                         <div slot="content0">
                                             <div class="message-content flex-a" v-for="(item,index) in  cardCai1" :key="index"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })"
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                 infoID:item.infoId})"
                                             >
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
@@ -310,7 +311,7 @@
                                                     {{item.title}}
                                                     </span>
                                                     <span class="message-name">{{item.name}}</span>
-                                                    <span class="message-timer">{{ dateFormat(item.createTime)}}</span>
+                                                    <span class="message-timer">{{ dateFormat(item.updateTime)}}</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -323,13 +324,13 @@
                         <Row>
                             <div class="pr12 pb12">
                                 <Card class="Position paC my-card1">
-                                    <tab-card Title="项目管理平台"  Height="305"  @open="">
+                                    <tab-card Title="项目管理平台"  Height="305"  ref="tabCardMd"  @Open="tabCardClick({index:$refs.tabCardMd.cardLine,url:cardMd,url1:cardMd1})">
                                         <div slot="content1"  ref="list1">
                                             <div class="message-content flex-a" v-for="(item,index) in cardMd" :key="index"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })"
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                  infoID:item.infoId})"
                                             >
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
@@ -345,9 +346,9 @@
                                             <div class="message-content flex-a" v-for="(item,index) in cardMd1" :key="index"
                                                  v-if="index<4"
                                                  @click=" fromSummit(item.value,{
-                                                 userCode:userInfo.idcardEncryption.toString(),
-                                                 changingtype:item.code,
-                                                 params:item.url })"
+                                                authToken:accessToken,
+                                                 templateName:item.code,
+                                                 infoID:item.infoId })"
                                             >
                                                 <p class="wh1 flex Position span-message" :id="`list${index}`" >
                                                     <span class="dian dian-black"></span>
@@ -385,70 +386,6 @@
                     </Col>
                 </Row>
             </Col>
-            <!--<Col :md="24" :lg="5">-->
-                <!--<Row>-->
-                    <!--<div class="pb12">-->
-                        <!--<Card  class="Position paC my-card ">-->
-                            <!--<div class="message">-->
-                              <!--<p class="wh1 Position maC span-message1">-->
-                                  <!--<span class="size5">预警信息</span>-->
-                                  <!--<span class="size6">{{WarningNews.length}}</span>-->
-                                  <!--<span class="size5">类</span>-->
-                                  <!--<span class="gen">更多</span>-->
-                              <!--</p>-->
-                                <!--<p @click="warningNewsClick(item.functionName)" class="wh1 flex maC Position span-message" v-for="(item,index) in WarningNews" :key="index" v-if="index<3">-->
-                                    <!--<a href="javascript:void(0);">-->
-                                    <!--<span class="dian"></span>-->
-                                    <!--<span class="">-->
-                                          <!--{{item.warningName}}-->
-                                    <!--</span>-->
-                                      <!--<span class="message-timer">{{item.count}}条</span>-->
-                                    <!--</a>-->
-                                <!--</p>-->
-
-                            <!--</div>-->
-                        <!--</Card>-->
-                    <!--</div>-->
-                <!--</Row>-->
-                <!--<Row>-->
-                    <!--<div class="pb12">-->
-                        <!--<Card  class="Position paC my-card ">-->
-                            <!--<div class="message message2">-->
-                                <!--<p class="wh1 Position maC span-message1">-->
-                                    <!--<span class="size5">常用链接</span>-->
-                                <!--</p>-->
-                                <!--<p class="wh1 flex maC Position span-message span-message2"  v-for="(item ,index) in  linkUrl" :key="index" >-->
-                                     <!--<span class="">-->
-                                     <!--<a :href="item.url" target="_blank">{{item.title}}</a>-->
-                                    <!--</span>-->
-                                <!--</p>-->
-                            <!--</div>-->
-                        <!--</Card>-->
-                    <!--</div>-->
-                <!--</Row>-->
-                <!--<Row>-->
-                    <!--<div class="pb12">-->
-                        <!--<Card  class="Position paC my-card ">-->
-                            <!--<div class=" message message3">-->
-                                <!--<p class="wh1 Position maC span-message1">-->
-                                    <!--<span class="size5">常用下载</span>-->
-                                <!--</p>-->
-                                <!--<a :href="item.url" target="_blank" v-for="(item,index) in download" :key="index" style="width: 100%;">-->
-                                    <!--<p class="wh1 Position maC span-message1" >-->
-                                <!--<span class="often-use">-->
-                                  <!--<span class="pl12 flex">-->
-                                      <!--<span>{{item.title}}</span>(<span>{{ dateFormat(item.updateTime)}}</span>）-->
-                                  <!--</span>-->
-                                <!--</span>-->
-                                    <!--</p>-->
-                                <!--</a>-->
-                            <!--</div>-->
-                        <!--</Card>-->
-                    <!--</div>-->
-                <!--</Row>-->
-              <!--<Row>-->
-              <!--</Row>-->
-            <!--</Col>-->
         </div>
 
     </div>
@@ -493,6 +430,7 @@
             return {
                 username:'',//用户名
                 userInfo:'',//用户信息
+               accessToken : '',
                 tips:{},
                 News:[],//新闻
                 Width:0,//新闻宽度超出显示省略号
@@ -537,19 +475,13 @@
                 Warning:'',
                 WarningNews:[],
                 selectNotice:'',
-                imgIcon:[
-                    require('../../assets/home-pages/Rectangle-path@2x.png'),
-                    require('../../assets/home-pages/Rectangle-path@2x(1).png'),
-                    require('../../assets/home-pages/Rectangle-path@2x(2).png'),
-                    require('../../assets/home-pages/Rectangle-path@2x(3).png'),
-                    require('../../assets/home-pages/Rectangle-path@2x(4).png'),
-                ],
                 Height:'208px',
                 data:'100%',
 
             };
         },
         created(){
+            this.accessToken=this.getStore('accessToken')
             downCount(323,'cardTitleList',this)
             this.pageData();
             this.cardLine=this.cardTitleList.length-1;
@@ -631,16 +563,16 @@
             },
             fromSummit:fromPost,
             warningNewsClick(item){
-                let url;
                 if(item){
                     let data={
-                        userCode:this.userInfo.idcardEncryption.toString(),
-                        templateName:item
+                        authToken: this.accessToken,
+                        templateName:'waringinfo',
+                        infoID:item.functionName
                     }
                     fromPost(this.Warning,data)
-                   // url=this.Warning+'&userCode='+this.userInfo.idcardEncryption.toString()+'&templateName='+item;
+
                 }
-             //   window.open(url,"_blank");
+
             },
             socketChange(item){
                 if(item.success){
@@ -656,9 +588,40 @@
                 }else {
                  this.fromSummit(url,
                      {
-                         userCode:this.userInfo.idcardEncryption.toString(),
-                         newsId:newID.toString()
+                         authToken: this.accessToken,
+                         templateName:'news',
+                         infoID:newID.toString()
                      })
+                }
+            },
+            noticeLocalClick(item,url,id,newID){
+                if(item){
+                    this.setStore('pagesInformationDetail',id)
+                    this.$router.push({
+                        name: "information-detail"
+                    });
+                }else {
+                    // this.fromSummit(url,
+                    //     {
+                    //         authToken: this.accessToken,
+                    //         templateName:'news',
+                    //         infoID:newID.toString()
+                    //     })
+                }
+            },
+            SelectLocalClick(item,url,id,newID){
+                if(item){
+                    this.setStore('pagesSubsystemNewsDetail',id)
+                    this.$router.push({
+                        name: "subsystem-detail"
+                    });
+                }else {
+                    // this.fromSummit(url,
+                    //     {
+                    //         authToken: this.accessToken,
+                    //         templateName:'news',
+                    //         infoID:newID.toString()
+                    //     })
                 }
             },
             dateFormat: dateFormat,
@@ -668,13 +631,6 @@
                 }else {
                     return require('../../assets/home-pages/heiheihei.png')
                 }
-            },
-            getHttp(url,id){
-               this.$http.get(url,{params:{idcardEncryption:id}},{}).then(response => {
-
-                }, response => {
-                    // error callback
-                });
             },
             imgFormat(item){
                 return require('../../assets/home-pages/'+item);
@@ -689,6 +645,7 @@
                 let data;
                 [data]=pageHome()
                 this.News=data.News;
+
               ///  this.cardOa=data.result
             },
             onWidth(){
@@ -783,6 +740,7 @@
                                 },
                                 "url":item.url
                             }).then(response => {
+
                                 let data=response.data
                       if(data){
 
@@ -802,13 +760,13 @@
                         let data=res;
                         this.tipsNews=data
                         this.News=data.result;
+
                     }
                 })
             },
             fullAdd(data,key){//已办，代办
                 fullList(data).then(res=>{
                     if(res.success){
-
                         this[key]=res.result
                         // fromPost({
                         //     userCode:this.userInfo.idcardEncryption.toString(),
@@ -865,19 +823,39 @@
                 })
             },
             entranceClick(item){
-               // let url;
-               // if(item){
-               //     url=item+'?userCode='+this.userInfo.idcardEncryption.toString();
-               // }else {
-               //     url=''
-               // }
-               // window.open(url,"_blank");
                 if(item){
-                    this.fromSummit(item,{userCode:this.userInfo.idcardEncryption.toString()})
+                    let data={
+                        authToken: this.accessToken,
+                        templateName:'homepage',
+                        infoID:null
+                    }
+                  this.fromSummit(item,data)
                 }
             },
             openHref:openHref,
+            accessChange(){
+                return  this.accessToken
+            },
+            tabCardClick(item){
+                if(item.index==0){
+                    if(item.url1[0]){
+                        this.fromSummit(item.url1[0].value,{
+                            authToken:this.accessToken,
+                            templateName:'donemoreinfo',
+                            infoID:null
+                        })
+                    }
 
+                }
+                if(item.index==1){
+                    if(item.url[0]){
+                    this.fromSummit(item.url[0].value,{
+                        authToken:this.accessToken,
+                        templateName:'todomoreinfo',
+                        infoID:null
+                    })}
+                }
+            }
 
         },
         mounted() {

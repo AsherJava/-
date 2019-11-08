@@ -6,7 +6,7 @@
     <!--待办已办数据列表条件查询-->
     <select id="selectBacklogOrFullListPageVoMap"
             resultType="cn.exrick.xboot.modules.backlogOrFullList.entity.BacklogOrFullList">
-        SELECT * FROM `t_backlog_or_full_list` where 1=1
+        SELECT * FROM  t_backlog_or_full_list where 1=1
         <if test='backlogOrFullList.userCode!=null and backlogOrFullList.userCode.trim()!=""'>
             and user_code like CONCAT('%', #{backlogOrFullList.userCode ,jdbcType=VARCHAR}, '%')
         </if>
@@ -25,16 +25,16 @@
         <if test='backlogOrFullList.code!=null and backlogOrFullList.code.trim()!=""'>
             and code like CONCAT('%', #{backlogOrFullList.code ,jdbcType=VARCHAR}, '%')
         </if>
-
-        ORDER BY sort_order ASC, create_time DESC
+        /*ORDER BY sort_order ASC , create_time DESC*/
+        ORDER BY sort_order ASC , create_time DESC
     </select>
 
     <!--portal待办已办数据列表条件查询-->
     <select id="selectBacklogOrFullListByMap"
             resultType="cn.exrick.xboot.modules.backlogOrFullList.entity.BacklogOrFullList" parameterType="Map">
-        /*SELECT * FROM `t_backlog_or_full_list` where 1=1*/
-  /*      SELECT * FROM `t_backlog_or_full_list` b left JOIN t_dict_data d on b.module_name=d.title where 1=1*/
-        SELECT * FROM `t_backlog_or_full_list` b left JOIN t_dict_data d on b.module_name=d.title where dict_id='2019082911'
+        /*SELECT * FROM t_backlog_or_full_list where 1=1*/
+  /*      SELECT * FROM t_backlog_or_full_list b left JOIN t_dict_data d on b.module_name=d.title where 1=1*/
+        SELECT * FROM  t_backlog_or_full_list b left JOIN t_dict_data d on b.module_name=d.title where dict_id='2019082911'
         <if test='map.backlogOrFullList.userCode!=null and map.backlogOrFullList.userCode.trim()!=""'>
             and user_code =#{map.backlogOrFullList.userCode,jdbcType=VARCHAR}
         </if>
@@ -67,15 +67,15 @@
 
     <select id="selectInfoId"
             resultType="java.lang.String" parameterType="Map">
-            select info_id from t_backlog_or_full_list
-            where info_id = #{ mapId.infoId } and user_code = #{ mapId.userCode }
+            select message_id from t_backlog_or_full_list
+            where message_id = #{ mapId.messageID } and user_code = #{ mapId.userCode }
 
     </select>
 
     <update id="UpdateMseeageType" parameterType="Map">
             update t_backlog_or_full_list
-            set code = #{ map.code }
-            where  info_id = #{ map.infoId } and user_code = #{ map.userCode }
+            set code = #{ map.code },update_time = #{ map.updateTime}
+            where  message_id = #{ map.messageID } and user_code = #{ map.userCode }
     </update>
 
 

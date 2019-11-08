@@ -28,7 +28,7 @@
         update_by,
         update_time,
         news_id,
-        del_flag from `t_news`where 1=1
+        del_flag from t_news where 1=1
         <if test="news.newsTitle !=null">
             and news_title like CONCAT('%', #{news.newsTitle}, '%')
         </if>
@@ -47,7 +47,7 @@
 
         SELECT
 *
-       from  `t_news`where 1=1
+       from  t_news where 1=1
 
 
         <if test='news.source !=null and news.source!=""'>
@@ -61,5 +61,76 @@
             LIMIT   #{news.num}
         </if>
     </select>
+
+
+
+    <!--portal新闻的左连接条件查询（用来查询出单点链接）-->
+    <select id="selectPortalNewsvoDict" resultType="cn.exrick.xboot.modules.news.entity.news">
+
+        SELECT
+        n.id,
+        n.news_title,
+        n.news_desc,
+        n.news_image_path,
+        n.news_rate,
+        n.news_is_top,
+        n.source,
+        n.image_url,
+        n.info_code,
+        n.create_by,
+        n.create_time,
+        n.update_by,
+        n.update_time,
+        n.news_id,
+        n.news_release,
+        d.value AS url
+        FROM t_news n left JOIN t_dict_data d on d.title=n.source and dict_id='203706453402324992'    where 1=1
+
+        <if test='news.source !=null and news.source!=""'>
+            and source =#{news.source}
+        </if>
+        <if test='news.infoCode !=null and news.infoCode!=""'>
+            and info_code =#{news.infoCode}
+        </if>
+        ORDER BY news_rate ASC, create_time DESC
+        <if test='news.num !=null and news.num!=""'>
+            LIMIT   #{news.num}
+        </if>
+    </select>
+
+
+    <select id="selectNewsvoDictPage" resultType="cn.exrick.xboot.modules.news.entity.news">
+
+        SELECT
+        n.id,
+        n.news_title,
+        n.news_desc,
+        n.news_image_path,
+        n.news_rate,
+        n.news_is_top,
+        n.source,
+        n.image_url,
+        n.info_code,
+        n.create_by,
+        n.create_time,
+        n.update_by,
+        n.update_time,
+        n.news_id,
+        n.news_release,
+        d.value AS url
+        FROM t_news n left JOIN t_dict_data d on d.title=n.source and dict_id='203706453402324992'    where 1=1
+
+        <if test='news.source !=null and news.source!=""'>
+            and source =#{news.source}
+        </if>
+        <if test='news.infoCode !=null and news.infoCode!=""'>
+            and info_code =#{news.infoCode}
+        </if>
+        ORDER BY news_rate ASC, create_time DESC
+        <if test='news.num !=null and news.num!=""'>
+            LIMIT   #{news.num}
+        </if>
+    </select>
+
 
 </mapper>

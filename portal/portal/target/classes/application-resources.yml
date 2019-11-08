@@ -2,3 +2,6 @@
   #控制对超级管理员的接口限制  true：开启控制器  false关闭控制器
 AdminIntercept:
     flag: true
+
+sms:
+    heartbeat: 5000

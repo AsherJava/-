@@ -1,8 +1,8 @@
 <template>
     <div  ref="horseLight" class="horseLight">
      <ul   ref="horseUl" :style="{left:Left+'px'}" @mouseover="moveClear" @mouseleave="move">
-        <li :style="{height:Height,width:Width}" v-for="(item,index) in dataList" :class="{leave:!(index==Index),enter:index==Index}">
-            <img :src="item" alt="">
+        <li :style="{height:Height,width:Width}" v-for="(item,index) in dataImg" :class="{leave:!(index==Index),enter:index==Index}">
+            <img :src="item" alt="" onerror="this.src='http://10.2.24.14:8899/portalImage/default.jpg'">
         </li>
     </ul>
     </div>
@@ -16,14 +16,6 @@
                 type:Array,
                 default:()=>{
                     return[
-                        'https://i1.fuimg.com/693259/32fe2a1e11a35de4.png',
-                        'https://i1.fuimg.com/693259/f3d7514217caa8b4.png',
-                        'http://i1.fuimg.com/693259/c54743d9260a8f81.png',
-                        'https://i1.fuimg.com/693259/3c99e08a4e4eabc6.png',
-                        'https://i1.fuimg.com/693259/c8a8767217be9bef.png',
-                        'https://i1.fuimg.com/693259/1a942aaf11693a29.png',
-                        'https://i1.fuimg.com/693259/e7bb49ee72cdd275.png',
-                        // 'https://i1.fuimg.com/693259/5fee12b44a5d06ac.png'
                     ]
                 }
             },
@@ -37,21 +29,39 @@
                 Width:'100%',
                 Left:0,
                 Index:0,
+                dataImg:[],
                 timer:null,
             }
         },
         watch:{
             Index(val){
                 this.$emit('onChange',val);
+            },
+            dataList(val){
+                this.dataFor(val)
             }
+
         },
         created(){
 
         },
         mounted(){
+            this.dataFor(this.dataList)
             this.move()
         },
         methods:{
+            dataFor(val){
+                var  data=[];
+
+                if(val){
+                    val.forEach(res=>{
+                        data.push(res.imageUrl)
+                    })
+                    this.dataImg=data
+                }else{
+                    this.dataImg=[ 'http://10.2.24.14:8899/portalImage/default.jpg',]
+                }
+            },
          move(){
              let that=this;
              this.timer=setInterval(function () {

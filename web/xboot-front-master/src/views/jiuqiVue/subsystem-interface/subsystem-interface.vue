@@ -48,7 +48,7 @@
                     </Row>
 
 
-                    <Row class="operation">
+                    <Row class="operation" style="padding-bottom: 15px">
 
                         <Button @click="addSystem" type="primary" icon="md-add">添加系统</Button>
                         <Button @click="delAll" icon="md-trash">批量删除</Button>
@@ -63,7 +63,7 @@
                         </Alert>
                     </Row>
 
-                    <Row>
+                    <Row style="padding-bottom: 15px">
                         <!-- 这里是表格展示组件-->
                         <Table :loading="loading" border :columns="columns" :data="data" ref="table" sortable="custom" @on-sort-change="changeSort" @on-selection-change="changeSelect"></Table>
                     </Row>
@@ -199,6 +199,12 @@
                     <SystemUploadPicInput @func="getMsgFormSon" ></SystemUploadPicInput>
 
                 </Form-item>-->
+                <FormItem label="短信预警">
+                    <i-switch size="large"  v-model="newXQ.warningStatus=='start'"@on-change="warningStatusChange">
+                        <span slot="open">开启</span>
+                        <span slot="close">关闭</span>
+                    </i-switch>
+                </FormItem>
                 <FormItem label="图标上传" prop="description">
                     <systemUploadPicInput @func="getMsgFormSon"></systemUploadPicInput>
                 </FormItem>
@@ -221,7 +227,9 @@
 
             </div>
         </Modal>
+        <frame-table ref="frameTable" :data-list="tableData" :columns="tableColumns" :open.sync="frameTableModal"></frame-table>
         <!--njp 20190717新增编辑弹出窗口end-->
+        <frame-edit  :open.sync="modalEdit" :formInline="formInline" @dataChange="editChange"></frame-edit>
     </div>
 </template>
 
@@ -250,6 +258,11 @@
         editNews,
     } from "@/api/index";
     import {
+        getSMSBySys,
+        delById,
+        insertOrUpdate
+    } from "@/api/receiveSMS";
+    import {
         disableSubsystemUrl,
         enableSubsystemUrl
     }from "@/api/manage";
@@ -257,6 +270,8 @@
     import circleLoading from "@/views/my-components/circle-loading.vue";
     import textarea from "@/views/jiuqiVue/myTemplate/textarea.vue";
     import systemUploadPicInput from "@/views/jiuqiVue/myTemplate/systemUploadPicInput.vue";
+    import frameTable  from '@/components/common/table/frame-table'
+    import frameEdit  from './common/frame-edit'
     //import MyUploadPicInput from "@/views/my-components/xboot/MyUploadPicInput";
     // import  uploadPicInput from "";
     export default {
@@ -265,10 +280,67 @@
             circleLoading,
             textarea,
             systemUploadPicInput,
+            frameTable,
+            frameEdit
            // MyUploadPicInput
         },
         data() {
             return {
+                frameTableModal:false,
+                tableData:[],
+                tableColumns: [
+                    {
+                        title: '姓名',
+                        key: 'name'
+                    },
+                    {
+                        title: '手机号',
+                        key: 'telephone',
+                        align:'center',
+                    },
+                    {
+                        title: '操作',
+                        key: 'delete',
+                        align:'center',
+                        render:(h,params) => {
+                            const row=params.row
+                            const color='#40a9ff';
+                            return h('div', {
+                                props: {
+                                },
+                                style:{
+                                    color:color,
+                                    cursor:'pointer',
+                                },
+                                on:{
+                                    click:() =>{
+                                        this.$Modal.confirm({
+                                            title: "确认删除",
+                                            content: "您确认要删除该条数据?",
+                                            onOk: () => {
+                                                this.operationLoading = true;
+                                                this.$refs.frameTable.deleteClick(row._index)
+                                                delById({id:row.id}).then(res=>{
+                                                    if(res.success){
+                                                        this.$Message.success("删除成功");
+                                                    }
+                                                })
+
+                                            }
+                                        });
+
+                                    }
+                                }
+                            }, '删除');
+                        }
+                    },
+                ],//
+                modalEdit:false,
+                formInline:{
+                    name:'',
+                    telephone:'',
+                    sysId:''
+                },
                 dropDownContent: "展开",
                 drop:false,
                 loading: true,
@@ -382,7 +454,10 @@
                  newsDesc: "",//描述
                  newsImagePath: "",//图片路径
                  newsRate: "",//系统等级上
-                 newsIsTop: "",//是否置顶*/
+                 newsIsTop: "",//是否置顶
+                    warningStatus :是否预警
+                 */
+
 
                 ,
                 //add nijianping for jiuqi-系统 20190715 end 
@@ -410,7 +485,7 @@
                     {
                         title: "系统名称",
                         key: "sysName",
-                        width: 150,
+                        minWidth: 120,
 
                     },
                     {
@@ -435,7 +510,8 @@
                     {
                         title: "排序",
                         key: "sortOrder",
-                        width: 160,
+                        align:'center',
+                        minWidth: 80,
 
                     },
                     {
@@ -454,8 +530,77 @@
                     {
                         title: "数据类型",
                         key: "infoType",
-                        width: 160,
+                        minWidth: 80,
 
+                    },
+                    {
+                        title: "连接状态",
+                        key: "connStatus",
+                        align:'center',
+                        minWidth: 80,
+                        render: (h, params) => {
+                            let status=params.row.connStatus
+                            let content=status==1?'正常':status==2?'异常':''
+                            let color=status==1?'#1DAD5E':status==2?'red':''
+                            return h('div', [
+                                h('span', {
+                                    style:{
+                                        color:color
+                                    }
+                                },content)
+                            ]);
+                        }
+
+                    },
+                    {
+                        title: "短信预警",
+                        key: "warningStatus",
+                        minWidth:180,
+                        render: (h, params) => {
+                            let status=params.row.warningStatus;
+                            let content=status=='start'?'已开启':status=='stop'?'关闭':''
+                            return h('div', [
+                                h('span', {
+                                    style:{
+                                    marginRight:'5px',
+                                        display:'inline-block',
+                                        width:'40px',
+                                    }
+                                },content),
+                                h('span', {
+                                    style:{
+                                        marginRight:'5px',
+                                        color:'#1890FF',
+                                        cursor:'pointer',
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this. frameTableModal=true;
+                                            this.getSMSBy(params.row.id,'tableData')
+
+                                        }
+                                    }
+                                },'接收人'),
+                                h('span', {
+                                    style:{
+                                        marginRight:'5px',
+                                        color:'#1890FF',
+                                        cursor:'pointer',//
+                                    },
+                                    on: {
+                                        click: () => {
+                                            if(params.row.id){
+                                                this. modalEdit=true;
+                                                this.formInline.sysId=params.row.id;
+                                            }else {
+                                                this.$Message.error('ID不存在!')
+                                            }
+
+                                        }
+                                    }
+                                },'添加')
+                            ]);
+                        }
                     },
 
                     {
@@ -463,7 +608,7 @@
                         key: "action",
                         align: "center",
                         fixed: "right",
-                        width: 300,
+                        minWidth: 220,
                         render: (h, params) => {
                             /*njp add 20190729 启用/禁用begin*/
                             let WXenableOrDisable = "";
@@ -573,7 +718,41 @@
                 types: [{id:"OA",name:"OA"},{id:"CW",name:"财务"},{id:"qt",name:"其他"}],
             };
         },
+        watch:{
+            frameTableModal(val){
+                if(!val){
+
+                }
+            },
+            tableData(val){
+            }
+        },
         methods: {
+            editChange(item){
+                insertOrUpdate(item).then(res=>{
+                    if(res.success){
+                        this.$Message.success('添加成功!');
+                        this.formInline.name='';
+                        this.formInline.telephone='';
+                        this.formInline.sysId=''
+                        this.modalEdit=false;
+                    }else {
+                        this.$Message.error('添加失败!');
+                    }
+
+                })
+            },
+            getSMSBy(id,key){
+                getSMSBySys({sysId:id}).then(res=>{
+                    if(res.success){
+                        if(res.result ){
+                            this[key]=res.result
+                        }else {
+                            this[key]=[]
+                        }
+                    }
+                })
+            },
             init() {
                 this.getRoleList();
                 // 获取所有菜单权限树
@@ -756,6 +935,7 @@
                 this.BJSubsystemNews.description=this.newXQ.description;
                 this.BJSubsystemNews.imageUrl=this.newXQ.imageUrl;
                 this.BJSubsystemNews.sortOrder=this.newXQ.sortOrder;
+                this.BJSubsystemNews.warningStatus=this.newXQ.warningStatus;
                 editSystem(this.BJSubsystemNews).then(res => {
                     this.submitLoading = false;
                     if (res.success == true) {
@@ -775,7 +955,6 @@
                 this.roleModalVisible = true;
             },
             addSystem() {
-
                 this.modalType = 0;
                 this.modalTitle = "添加系统";
 
@@ -1070,6 +1249,13 @@
                 this.subsystemNews.sname="";
                 this.subsystemNews.url="";
                 this.getRoleList();
+            },
+            warningStatusChange(item){    //d短信预警开关变换
+                if(item){
+                    this.newXQ.warningStatus='start'
+                }else {
+                    this.newXQ.warningStatus='stop'
+                }
             }
         },
         mounted() {

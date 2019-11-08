@@ -24,7 +24,7 @@
     </select>
 
     <select id="findUsernamesByRoleId" resultType="cn.exrick.xboot.modules.base.entity.User">
-        SELECT uu.id,uu.username FROM `t_user` uu left JOIN t_user_role ur on uu.id=ur.user_id where ur.role_id=#{roleId}
+        SELECT uu.id,uu.username FROM t_user uu left JOIN t_user_role ur on uu.id=ur.user_id where ur.role_id=#{roleId}
     </select>
 
     <select id="findMobileByName" resultType="java.lang.String">
@@ -34,12 +34,12 @@
     </select>
 
     <select id="findUserRoleByRoleId" resultType="cn.exrick.xboot.modules.base.entity.UserRole" >
-        SELECT * FROM `t_user_role`
+        SELECT * FROM t_user_role
         WHERE role_id = #{roleId,jdbcType=VARCHAR}
        /* SELECT * FROM t_user_role*/
     </select>
     <select id="findUserRoleByUserId" resultType="cn.exrick.xboot.modules.base.entity.UserRole" >
-        SELECT * FROM `t_user_role`
+        SELECT * FROM t_user_role
         WHERE user_id = #{userId,jdbcType=VARCHAR}
        /* SELECT * FROM t_user_role*/
     </select>

@@ -57,7 +57,6 @@
 
 
                     <Row class="operation">
-
                         <Button @click="addSystem" type="primary" icon="md-add">添加公文</Button>
                         <Button @click="delAll" icon="md-trash">批量删除</Button>
                         <Button @click="init" icon="md-refresh">刷新</Button>
@@ -92,21 +91,38 @@
                 <FormItem label="公文标题" prop="title">
                     <Input v-model="editSubsystemNews.title" placeholder="标题"/>
                 </FormItem>
+                <span v-if="!show">
                 <FormItem label="url" prop="url">
                     <Input v-model="editSubsystemNews.url"  placeholder="url"/>
                 </FormItem>
-                <FormItem label="数据来源" prop="">
+                </span>
+                <span v-if="!show">
+                <FormItem label="数据来源" prop="source">
                     <Input v-model="editSubsystemNews.source"  placeholder="数据来源"/>
                 </FormItem>
-                <FormItem label="部门" prop="department">
-                    <queryDepartmentXL   @on-change="AddquerySelectDepTree"  ref="depTree"></queryDepartmentXL>
-
+                </span>
+               <!-- <FormItem label="部门" prop="department">
+                <queryDepartmentXL   @on-change="AddquerySelectDepTree"  ref="depTree"></queryDepartmentXL>
+            </FormItem>-->
+                <FormItem label="部门" prop="title" >
+                    <JQdepartmenttree :depName="editSubsystemNews.department"  @on-change="handleSelectDepTree" @func="editDepTitle" ref="depTree"></JQdepartmenttree>
                 </FormItem>
+                <span v-if="show">
+                <FormItem label="公告内容" prop="name"  >
+                    <Input  @on-focus="showEditor" type="textarea" :rows="4" placeholder="Enter something..." />
+                </FormItem>
+                </span>
             </Form>
             <div slot="footer">
                 <Button type="text" @click="cancelRole">取消</Button>
                 <!--添加公文提交-->
                 <Button type="primary" :loading="submitLoading" @click="submitNew">提交</Button>
+            </div>
+        </Modal>
+        <!--文本编辑器-->
+        <Modal v-model="editorModalVisible" fullscreen title="editorModalTitle Modal">
+            <div >
+                <quill-editor  v-model="editSubsystemNews.conten" ></quill-editor>
             </div>
         </Modal>
 
@@ -125,7 +141,6 @@
                     <Input v-model="newXQ.source"  placeholder="数据来源" />
                 </FormItem>
                 <FormItem  label="部门" prop="name">
-
                     <JQdepartmenttree :depName="newXQ.department"  @on-change="handleSelectDepTree" @func="editDepTitle" ref="depTree"></JQdepartmenttree>
                 </FormItem>
             </Form>
@@ -189,6 +204,7 @@
         },
         data() {
             return {
+                show: true,//控制内容（文本编辑器显示）
                 dropDownContent: "展开",
                 drop:false,
                 loading: true,
@@ -232,10 +248,13 @@
 
                 //20190722 njp子系统新闻对象
                 editSubsystemNews: {
+                    id:"",
                     title: "",
                     url: "",
                     department: "",
                     source: "",
+                    conten: "",//内容
+                    infoCode:"1"//默认本地数据
                 },
 
                 editSubsystemNewsValidate: {
@@ -464,6 +483,13 @@
                 this.getRoleList();
                 // 获取所有菜单权限树
             },
+
+            showEditor() {
+
+                this.editorModalTitle="文本编辑器",
+                    this.editorModalVisible= true
+
+            },
             //njp add 20190717 父组件接收子组件信息的方法 begin
             getMsgFormSon(data){
 
@@ -592,11 +618,11 @@
                 this.$refs.editSubsystemNews.validate(valid => {
                     if (valid) {
                         if (this.modalType == 0) {
+                            // 添加 避免编辑后传入id
+                            delete this.editSubsystemNews.id;
                             // 添加
                             this.submitLoading = true;
                             addSubsystemNotice(this.editSubsystemNews).then(res => {
-
-
                                 this.submitLoading = false;
                                 if (res.success == true) {
                                     this.$Message.success("操作成功");
@@ -605,6 +631,17 @@
                                     this.newImage="";
                                 }
                             });
+                        }else{
+
+                                editSubsystemNews(this.editSubsystemNews).then(res => {
+                                    this.submitLoading = false;
+                                    if (res.success == true) {
+                                        this.$Message.success("操作成功");
+                                        this.getRoleList();
+                                        this.roleModalVisible = false;
+                                    }
+                                });
+
                         }
                     }
                 });
@@ -631,18 +668,12 @@
 
 
             },
-            addRole() {
-                this.modalType = 0;
-                this.modalTitle = "添加公文";
-                this.$refs.roleForm.resetFields();
-                delete this.roleForm.id;
-                this.roleModalVisible = true;
-            },
+
             addSystem() {
-
+                this.show=true,
                 this.modalType = 0;
                 this.modalTitle = "添加公文";
-
+                this.editSubsystemNews.department="",
                 this.$refs['editSubsystemNews'].resetFields(),
                     //清空表begin
                     /*  this.newForm.newsTitle="";
@@ -653,26 +684,10 @@
                       this.newForm.newsIsTop="";
                       this.newForm.imageId="";*/
                     //清空表end
-
-
                     delete this.editSubsystemNews.id;
                 this.roleModalVisible = true;
             },
-            edit(v) {
-                this.modalType = 1;
-                this.modalTitle = "编辑角色";
-                this.$refs.roleForm.resetFields();
-                // 转换null为""
-                for (let attr in v) {
-                    if (v[attr] == null) {
-                        v[attr] = "";
-                    }
-                }
-                let str = JSON.stringify(v);
-                let roleInfo = JSON.parse(str);
-                this.roleForm = roleInfo;
-                this.roleModalVisible = true;
-            },
+
             remove(v) {
                 this.$Modal.confirm({
                     title: "确认删除",
@@ -871,21 +886,32 @@
                     }
                 });
             },
-            //新闻编辑
+            //编辑数据
             editDep(v) {
-                this.newXQ=[];
-                this.BJmodalType = 0;
-                this.BJmodalTitle = "编辑";
-                this.BJModalVisible = true;
-
-                //njp 20190715 通过id查询新闻详情 begin
+                this.modalType = 1;
+                this.modalTitle = "编辑公文";
+                this.$refs['editSubsystemNews'].resetFields(),
+                    this.show=true;
+                if(v.infoCode==0){
+                    this.show=false;
+                }
+                this.roleModalVisible = true;
+                //njp 20190715 通过id查询数据详情 begin
                 getSubsystemNewsById(v.id).then(res => {
 
                     this.operationLoading = false;
                     if (res.success == true) {
-                        this.newXQ = res.result;
-                        this.BJSubsystemNews.department=this.newXQ.department;
-                        this.newForm.newsConten= this.newXQ.newsConten;
+                        //this.editSubsystemNews = res.result;
+                            this.editSubsystemNews.id= res.result.id,
+                            this.editSubsystemNews.title= res.result.title,
+                            this.editSubsystemNews.url= res.result.url,
+                            this.editSubsystemNews.department= res.result.department,
+                            this.editSubsystemNews.source= res.result.source,
+                            this.editSubsystemNews.conten= res.result.conten,//内容
+                            this.editSubsystemNews.infoCode= res.result.infoCode
+
+                       /* this.BJSubsystemNews.department=this.newXQ.department;
+                        this.newForm.newsConten= this.newXQ.newsConten;*/
                         //this.$Message.success("删除成功");
                         //this.getRoleList();
                     }
@@ -971,11 +997,12 @@
             AddquerySelectDepTree(v){
                 this.editSubsystemNews.department=v.value;
             },
+
             handleSelectDepTree(v) {
                 let id= v[0];
             },
             editDepTitle(data){
-                this.BJSubsystemNews.department=data;
+                this.editSubsystemNews.department=data;
             },
         },
         mounted() {
@@ -983,3 +1010,17 @@
         }
     };
 </script>
+<style lang="less">
+//文本编辑器
+.edit_container {
+font-family: 'Avenir', Helvetica, Arial, sans-serif;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+text-align: center;
+color: #2c3e50;
+margin-top: 60px;
+}
+.ql-editor{
+height:1000px;
+}
+</style>

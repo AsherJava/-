@@ -42,8 +42,8 @@
                                            :placeholder="tips.username.tips[1]"></input-use>
                                 <input-use ref="input2" is-icon="lock" v-model="form.password"
                                            Type="password"
-                                           :data.sync="form.password" :tips="tips.password.tips[0]"
-                                           :placeholder="tips.password.tips[1]"
+                                           :data.sync="form.password" :tips="tips.password.tips[3]"
+                                           :placeholder="tips.password.tips[2]"
                                 ></input-use>
                                 </form>
                             </div>
@@ -53,12 +53,12 @@
                                            :placeholder="tips.usernameBusiness.tips[1]"></input-use>
                                 <input-use ref="input5" is-icon="code" v-model="form2.code" :data.sync="form2.code"
                                            :tips="tips.codeAPP.tips[0]" :placeholder="tips.codeBusiness.tips[1]"
+                                           :user-send=false
                                            @changeCode="sendCode" @countPlus="countChange1"></input-use>
                             </div>
                             <div>
                                 <button class="deng" @click="buttonClick">登 录</button>
                                 <!--<button class="deng" @click=" validateInput('form')">临 时 登 录</button>-->
-
                             </div>
                         </div>
                         <div v-show="!loginShow">
@@ -134,7 +134,7 @@
                     </span>
                     </p>
                     <div class="login-content login-content-modal">
-                        <div v-show="openIndex==0" v-model="form">
+                        <div v-model="form">
                             <input-use
                                     ref="input7"
                                     is-icon="clock"
@@ -217,11 +217,11 @@
         getJWT,
         sendSms,
         smsLogin,
-        sendCode,
         receiveCode,
         getRoleCode
     } from "@/api/index";
     import {ssoLoginSend,loginWho,generateQRCode,CheckLogin,registAssessor,submitApprovalInfo} from "@/api/moduleIndex";
+    import {smsSendCode,smsVerifyLogin} from  '@/api/receiveSMS.js'
     import util from "@/libs/util.js";
     import loginModal from "../components/login/loginModal.vue";
     import {isMobile, validatenull,isCardId} from "@/libs/validate.js";
@@ -281,21 +281,19 @@
                 },
                 form2: {
                     username: "",
-                    password: "",
-                    mobile: "",
                     code: ""
                 },
                 formAssessor:{
                     username: '',
                 },
                 tips: {
-                    username: {tips: ['请正确输入登录账号!', '请输入登录账号']},
+                    username: {tips: ['请正确输入登录账号或手机号!', '登录账号或手机号']},
                     password: {tips:['请正确输入APP动态码!', '请输入APP动态码', '请输入用户密码','请正确输入密码!'] },
                     passwordAgain:{tips:['两次输入密码不一致', '请再次输入密码'] },
                     usernameAPP: [],
                     passwordApp: [],
                     codeAPP: {tips: ['请正确输入登录密码!', '请输入登录密码']},
-                    usernameBusiness: {tips: ['请正确输入登录账号或手机号!', '请输入登录账号或手机号']},
+                    usernameBusiness: {tips: ['请正确输入登录账号或手机号!', '登录账号或手机号']},
                     passwordBusiness: {tips: ['请正确输入APP动态码!', 'APP动态码']},
                     codeBusiness: {tips: ['请正确输入短信验证码!', '短信验证码']},
                     clockCode: ['您的验证码仍在有效期内', '您的验证码已失效'],
@@ -362,7 +360,6 @@
             AssessorLogon(val){
             },
             shuaShow(val) {
-                console.log(val)
             },
             qrMark(val){
                 if(val){
@@ -396,7 +393,6 @@
                                     userInfo().then(res => {
                                         if (res.success == true) {
 // 避免超过大小限制
-                                            console.log('useInfo')
                                             delete res.result.permissions;
                                             let roles = [];
                                             res.result.roles.forEach(e => {
@@ -478,7 +474,6 @@
                 userInfo().then(res => {
                     if (res.success == true) {
 // 避免超过大小限制
-                        console.log(222)
                         delete res.result.permissions;
                         let roles = [];
                         res.result.roles.forEach(e => {
@@ -586,30 +581,9 @@
                     if (this.$refs.input1.isShow | this.$refs.input2.isShow) {
 
                     } else {
-                        loginWho(this.form).then(res => {
-
-                                if (res.success) {
-                                    this.setStore("isRole",res.result.isRole);
-                               //    return      this.validateInput('form')
-                                    if(res.result.isRole=='other'|res.result.isRole=='assessor'){//其他情况 this.validateInput('form')旧的登录|res.result.isRole=='assessor'
-                                      //  this.modalClick('AssessorLogon');
-                                        this.modalClick('loginModal');
-                                    }else if(res.result.isRole=='adminN'){//没有有审批员情况下的管理员
-                                        this.modalClick('AssessorLogon');
-                                    }else if(res.result.isRole=='adminY'){//有审批员情况下的管理员：adminY
-                                        this.modalClick('assessorActive')
-                                        this.submitApproval()
-
-                                    }else {
-                                        //this.validateInput('form')
-                                    }
-
-                                }else {
-                                    this.$Message.error(res.message);
-                                }
-                        })
+                        this.roleValidation(this.form)
                     }
-                } else if (this.openIndex == 1) {
+                } else if (this.openIndex == 2) {
                     if (validatenull(this.form1.code)) {
                         this.$refs.input3.isShow = true
                     }
@@ -617,7 +591,7 @@
                     } else {
 //  this.sendCode('form1')
                     }
-                } else if (this.openIndex == 2) {
+                } else if (this.openIndex == 1) {
                     if (validatenull(this.form2.username)) {
                         this.$refs.input4.isShow = true
                     }
@@ -626,15 +600,61 @@
                     }
                     if (this.$refs.input4.isShow | this.$refs.input5.isShow) {
                     } else {
-                        this.receiveCode('form2')
+                    this.verifyLogin(this.form2)
                     }
                 }
             },
-            receiveCode(item) {
+            roleValidation(item){//三权分立角色验证
+                loginWho(item).then(res => {
+                    if (res.success) {
+                        this.setStore("isRole",res.result.isRole);
+                            return      this.validateInput('form')
+                        if(res.result.isRole=='other'|res.result.isRole=='assessor'){//其他情况 this.validateInput('form')旧的登录|res.result.isRole=='assessor'
+                            //  this.modalClick('AssessorLogon');
+                            this.modalClick('loginModal');
+                        }else if(res.result.isRole=='adminN'){//没有有审批员情况下的管理员
+                            this.modalClick('AssessorLogon');
+                        }else if(res.result.isRole=='adminY'){//有审批员情况下的管理员：adminY
+                            this.modalClick('assessorActive')
+                            this.submitApproval(this.form)
+
+                        }else {
+                            //this.validateInput('form')
+                        }
+
+                    }else {
+                        this.$Message.error(res.message);
+                    }
+                })
+            },
+            verifyLogin(item){
+                smsVerifyLogin(item).then(res=>{
+                    let isRole;
+                    if (res.success){
+                        this.setStore("isRole",res.result.adminFlag.isRole);
+                        isRole=res.result.adminFlag.isRole;
+                        //  return      this.validateInput('form')
+                        if(isRole=='other'|isRole=='assessor'){//其他情况 this.validateInput('form')旧的登录|res.result.isRole=='assessor'
+                            //  this.modalClick('AssessorLogon');
+                            this.modalClick('loginModal');
+                        }else if(isRole=='adminN'){//没有有审批员情况下的管理员
+                            this.modalClick('AssessorLogon');
+                        }else if(isRole=='adminY'){//有审批员情况下的管理员：adminY
+                            this.modalClick('assessorActive')
+                            this.submitApproval(this.form2)
+
+                        }else {
+
+                        }
+                    }else {
+                        this.$Messsage.error(this.message)
+                    }
+                })
+            },
+            receiveCode(item) {//企业微信
                 receiveCode({
                     username: this[item].username,
                     rewxcode: this[item].code,
-
                 }).then(res => {
                     if (res.success == true) {
                         this.setStore("accessToken", res.result);
@@ -670,13 +690,12 @@
                             }
                         });
                     } else {
-// this.loading = false;
+                         this.loading = false;
                         this.$Message.error(res.message)
                     }
                 });
             },
             sendCodeModal(item){
-                console.log(this.form)
                 ssoLoginSend(this.form).then(res=>{
                     if(res.success){
                         this.$Message.success(res.message)
@@ -727,13 +746,21 @@
             },
             sendCode() {
                 if (this.form2.username) {
-                    sendCode({
+                    smsSendCode({
                         username: this.form2.username,
                     }).then(res => {
+                        if(res.success){
+                            this.$refs.input5.startSend();
+                            this.$refs.input5.stop=true;
+                            this.$Message.success(res.message)
+                        }else {
+                          this.$Message.error(res.message)
+                        }
 
                     });
                 } else {
-                    this.$Message.success(this.tips.usernameBusiness.tips[0]);
+                    this.$refs.input4.isShow = true;
+                    this.$Message.error(this.tips.usernameBusiness.tips[0]);
                 }
 
             },
@@ -759,7 +786,6 @@
                                 this.setStore("roles", roles);
                                 if (this.saveLogin) {
 // 保存7天
-                                    console.log(res.result)
                                     Cookies.set("userInfo", JSON.stringify(res.result), {
                                         expires: 7
                                     });
@@ -848,7 +874,7 @@
                 this.$Notice.info({
                     title: "体验账号密码",
                     desc:
-                        "账号1：test 密码：123456 <br>账号2：test2 密码：123456 ！",
+                        "账号1：test 密码：123456 <br>",
                     duration: 10
                 });
             },
@@ -870,8 +896,8 @@
                 }
 
             },
-            submitApproval(){
-                let str='name'+this.form.username+'time'+new  Date().getTime()+'random'+Math.random()*100
+            submitApproval(item){
+                let str='name'+item.username+'time'+new  Date().getTime()+'random'+Math.random()*100
                 let data={adminCode:str}
                 submitApprovalInfo(data).then(res=>{
                     if(res.success){

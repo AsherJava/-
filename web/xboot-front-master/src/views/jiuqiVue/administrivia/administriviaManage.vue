@@ -77,7 +77,12 @@
                     </Select>
                 </FormItem>
 
-
+                        <FormItem label="短信预警">
+                            <i-switch size="large"  v-model="newForm.newsRelease=='1'"@on-change="statusChange">
+                                <span slot="open">开启</span>
+                                <span slot="close">关闭</span>
+                            </i-switch>
+                        </FormItem>
 
                 <!--  <FormItem label="系统类型" prop="type">
 
@@ -208,7 +213,7 @@
 
                 </FormItem>
                 <FormItem label="新闻描述" prop="description">
-                    <Input v-model="newXQ.newsDesc"  placeholder="描述" />
+                    <Input v-model="newXQ.newsDesc"  placeholder="描述"  value="新闻描述"/>
 
                 </FormItem>
                 <span v-if="show">
@@ -236,6 +241,13 @@
                         </Option>
                     </Select>
 
+                </FormItem>
+
+                <FormItem label="短信预警">
+                    <i-switch size="large"  v-model="newXQ.newsRelease==1"@on-change="bjStatusChange">
+                        <span slot="open">开启</span>
+                        <span slot="close">关闭</span>
+                    </i-switch>
                 </FormItem>
             </Form>
 
@@ -395,6 +407,7 @@
                     newsRate: 1,//新闻等级上
                     newsIsTop: "1",//是否置顶
                     imageId: "",//图片表id
+                    newsRelease: 2
                 },
 
                 newFormValidate: {
@@ -419,6 +432,7 @@
                     newsImagePath: "",//图片路径
                     newsRate: "0",//新闻等级上
                     newsIsTop: "1",//是否置顶
+                    newsRelease:2
                 },
                 //新闻编辑存储提交数据的对象 20190717 end
                 //add nijianping for jiuqi-新闻 20190715 begin 
@@ -467,14 +481,14 @@
                     {
                         title: "新闻描述",
                         key: "newsDesc",
-                        minWidth: 190,
+                        minWidth: 160,
 
                     },
                     {
                         title: "新闻级别",
                         key: "newsRate",
                         Width: 150,
-
+                        sortType: "asc"
                     },
                     {
                         title: "置顶",
@@ -496,13 +510,27 @@
                         Width: 100,
 
                     },
+                    {
+                        title: "发布",
+                        key: "newsRelease",
+                        minWidth: 40,
+                        render: (h, params) => {
+                            let rel = "";
+                            if (params.row.newsRelease == 1) {
+                                rel = "已发布";
+                            } else if (params.row.newsRelease == 2) {
+                                rel = "未发布";
+                            }
+                            return h("div", rel);
+                        }
+                    },
 
                     {
                         title: "创建时间",
                         key: "createTime",
                         width: 160,
 
-                        sortType: "desc"
+
                     },
                     {
                         title: "更新时间",
@@ -634,6 +662,22 @@
                 this.getRoleList();
                 // 获取所有菜单权限树
             },
+
+            bjStatusChange(item){
+                this.newXQ.newsRelease
+                if(item){
+                    this.newXQ.newsRelease=1
+                }else {
+                    this.newXQ.newsRelease=2
+                }
+            },
+            statusChange(item){
+                if(item){
+                    this.newForm.newsRelease=1
+                }else {
+                    this.newForm.newsRelease=2
+                }
+            },
             //njp add 20190717 父组件接收子组件信息的方法 begin
             getMsgFormSon(data){
                 this.newImage=data;
@@ -720,10 +764,8 @@
             getRoleList() {
                 this.loading = true;
                 let params = {
-                    pageNumber: this.pageNumber,
-                    pageSize: this.pageSize,
-                    sort: this.sortColumn,
-                    order: this.sort
+                    current: this.pageNumber,
+                    size: this.pageSize,
                 };
                 getNews(params).then(res => {
 
@@ -794,6 +836,7 @@
                         //this.newBJForm.newsIsTop=this.newXQ.newsIsTop;
                         this.newBJForm.newsIsTop=this.istop.newIsTop;
                         this.newBJForm.newsConten=this.newForm.newsConten;
+                        this.newBJForm.newsRelease=this.newXQ.newsRelease;
                         editNews(this.newBJForm).then(res => {
                                 this.submitLoading = false;
                                 if (res.success == true) {

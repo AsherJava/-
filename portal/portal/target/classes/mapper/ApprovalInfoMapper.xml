@@ -5,7 +5,7 @@
 <!--三权分立查询超级管理员登录的审批数据精确查询-->
     <select id="selectApprovalInfo"
             resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
-        SELECT * FROM `t_approval_info` t where 1=1
+        SELECT * FROM t_approval_info t where 1=1
         /*审批状态*/
         <if test='approvalInfo.approvalStatus!=null'>
             and  t.approval_status =  #{approvalInfo.approvalStatus}
@@ -26,7 +26,7 @@
     <!--查询当前过期时间小于当前时间的各个状态的数据-->
     <select id="selectApprovalInfoByAgo"
             resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
-        SELECT * FROM `t_approval_info` t where 1=1
+        SELECT * FROM t_approval_info t where 1=1
         /*审批状态*/
         <if test='approvalStatus!=null'>
             and  t.approval_status =  #{approvalStatus}
@@ -40,7 +40,7 @@
     <!--查询待审批最新的一条数据-->
     <select id="selectApprovalInfoByAgo"
             resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
-        SELECT * FROM `t_approval_info` t where 1=1
+        SELECT * FROM t_approval_info t where 1=1
         /*审批状态*/
         <if test='approvalStatus!=null'>
             and  t.approval_status =  #{approvalStatus}
@@ -56,7 +56,7 @@
     <!--三权分立查询超级管理员登录的审批数据模糊查询-->
     <select id="approvalInfoFuzzyQuery"
             resultType="cn.exrick.xboot.modules.ApprovalInfo.entity.ApprovalInfo">
-        SELECT * FROM `t_approval_info` t where 1=1
+        SELECT * FROM t_approval_info t where 1=1
         /*审批状态*/
         <if test='approvalStatus!=null'>
             and  t.approval_status =  #{approvalStatus}

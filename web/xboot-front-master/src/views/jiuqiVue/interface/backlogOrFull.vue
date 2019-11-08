@@ -79,7 +79,7 @@
 
                     <Row>
                         <!-- 这里是表格展示组件-->
-                        <Table :loading="loading" border :columns="columns" :data="data" ref="table" sortable="custom" @on-sort-change="changeSort" @on-selection-change="changeSelect"></Table>
+                        <Table :loading="loading" border :columns="columns" :data="data" ref="table" @on-sort-change="changeSort" @on-selection-change="changeSelect"></Table>
                     </Row>
 
 
@@ -101,10 +101,10 @@
                 <FormItem label="url" prop="url">
                     <Input v-model="submitForm.url"  placeholder="url"/>
                 </FormItem>
-                <FormItem label="数据来源" prop="source">
+               <!-- <FormItem label="数据来源" prop="source">
                     <Input v-model="submitForm.source"  placeholder="数据源"/>
-                </FormItem>
-                <FormItem label="系统模块" prop="moduleName">
+                </FormItem>-->
+                <FormItem label="数据来源" prop="moduleName">
                     <Input v-model="submitForm.moduleName"  placeholder="数据源"/>
                 </FormItem>
 
@@ -204,7 +204,7 @@
                 searchKey: "",
                 //modefy nijianping for jiuqi-portal-待办已办 20190715 begin
                 //在使用mybatis-plus是按照时间排序需要传这个字段
-                sortColumn: "create_time",
+                //sortColumn: "create_time",
                 //modefy nijianping for jiuqi-portal-待办已办 20190715 end
 
                 //njp详情表单 begin
@@ -220,7 +220,7 @@
                 BJModalVisible:false,
                 //njp 20190717 待办已办编辑表单显示字段 end
 
-                sortType: "desc",
+                //sortType: "desc",
                 modalType: 0,
                 roleModalVisible: false,
                 permModalVisible: false,
@@ -256,12 +256,12 @@
                     title: [
                         { required: true, message: "标题不能为空", trigger: "blur" }
                     ],
-                    url: [
+                    /*url: [
                         { required: true, message: "url不能为空", trigger: "blur" }
                     ],
                     code: [
                         { required: true, message: "code不能为空", trigger: "blur" }
-                    ],
+                    ],*/
 
 
                 },
@@ -288,12 +288,12 @@
                     newsTitle: [
                         { required: true, message: "标题不能为空", trigger: "blur" }
                     ],
-                    newsRate: [
+                  /*  newsRate: [
                         { required: true, message: "待办已办等级不能为空", trigger: "blur" }
                     ],
                     newsIsTop: [
                         { required: true, message: "不能为空", trigger: "blur" }
-                    ],
+                    ],*/
                 },
                 //待办已办编辑存储提交数据的对象 20190717 begin
                 newBJForm: {
@@ -339,34 +339,20 @@
                         align: "center"
                     },
                     {
-                        title: "用户标识",
-                        key: "userCode",
-                        minWidth: 130,
-
-                    },
-
-                    {
                         title: "标题",
                         key: "title",
                         minWidth: 130,
 
                     },
                     {
-                        title: "url",
-                        key: "url",
-                        minWidth: 190,
-
-
-                    },
-                    {
-                        title: "模块名称",
-                        key: "moduleName",
-                        width: 160,
+                        title: "用户标识",
+                        key: "userCode",
+                        minWidth: 130,
 
                     },
                     {
                         title: "数据来源",
-                        key: "source",
+                        key: "moduleName",
                         width: 160,
 
                     },
@@ -374,14 +360,12 @@
                         title: "排序值",
                         key: "sortOrder",
                         width: 100,
-
                     },
                     {
                         title: "创建时间",
                         key: "createTime",
                         width: 160,
 
-                        sortType: "desc"
                     },
                     {
                         title: "更新时间",
@@ -479,7 +463,7 @@
                     current: 1,
                     size: 10,
                     //sort: "create_time",
-                    order: "desc",
+                   // order: "desc",
                 },
                 subsystemNews: {
                     title: "",//待办已办标题
@@ -488,7 +472,7 @@
                     current: 1,
                     size: 10,
                     //sort: "create_time",
-                    order: "desc",
+                    //order: "desc",
                 },
                 types: [{id:"OA",name:"OA"},{id:"CW",name:"财务"},{id:"qt",name:"其他"}],
             };

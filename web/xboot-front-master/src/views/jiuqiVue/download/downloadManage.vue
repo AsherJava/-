@@ -51,6 +51,9 @@
                     <Row class="operation">
 
                         <Button @click="addSystem" type="primary" icon="md-add">添加链接</Button>
+
+                       <!-- <Button @click="addResources" type="info" icon="md-add">添加资源</Button>-->
+                        <Button @click="addResources" icon="md-add">添加资源</Button>
                         <Button @click="delAll" icon="md-trash">批量删除</Button>
                         <Button @click="init" icon="md-refresh">刷新</Button>
                         <circleLoading v-if="operationLoading"/>
@@ -84,22 +87,37 @@
                 <FormItem label="链接标题" prop="title">
                     <Input v-model="editSubsystemNews.title" placeholder="标题"/>
                 </FormItem>
+                <span v-show="!resourcesShow">
                 <FormItem label="url" prop="url">
                     <Input v-model="editSubsystemNews.url"  placeholder="url"/>
                 </FormItem>
+                    </span>
+
                 <FormItem label="部门" prop="department">
                   <!--  <Select v-model="editSubsystemNews.department"  placeholder="请选择">
                         <Option v-for="type in types"  :value="type.id" :key="type.id">
                             {{type.name}}
                         </Option>
                     </Select>-->
-                    <queryDepartmentXL   @on-change="AddquerySelectDepTree"  ref="depTree"></queryDepartmentXL>
+                    <JQdepartmenttree :depName="editSubsystemNews.department"  @on-change="handleSelectDepTree" @func="editDepTitle" ref="depTree"></JQdepartmenttree>
                 </FormItem>
+                <span v-show="resourcesShow">
+                     <FormItem label="资源上传" prop="">
+                   <uploadfileForlink ref="myUpchild"  @func="getUpdate"></uploadfileForlink>
+
+                 </FormItem>
+
+                </span>
             </Form>
             <div slot="footer">
                 <Button type="text" @click="cancelRole">取消</Button>
                 <!--添加链接提交-->
+                <span v-show="!resourcesShow">
                 <Button type="primary" :loading="submitLoading" @click="submitNew">提交</Button>
+                </span>
+                <span v-show="resourcesShow">
+                <Button type="primary" :loading="submitLoading" @click="submitUpdate">提交</Button>
+                </span>
             </div>
         </Modal>
 
@@ -197,6 +215,9 @@
     import queryDepartmentXL from "@/views/jiuqiVue/myTemplate/queryDepartmentXL.vue";
     import MyUploadPicInput from "@/views/my-components/xboot/MyUploadPicInput";
     import JQdepartmenttree from "@/views/jiuqiVue/myTemplate/JQdepartment-tree.vue";
+    import uploadfileForlink from "@/views/jiuqiVue/myTemplate/uploadfileForlink.vue";
+
+
     // import  uploadPicInput from "";
     export default {
         name: "downloadManage",
@@ -205,8 +226,9 @@
             queryDepartmentXL,
             circleLoading,
             textarea,
+            uploadfileForlink,
+            MyUploadPicInput,
 
-            MyUploadPicInput
         },
         data() {
             return {
@@ -243,7 +265,7 @@
                 roleModalVisible: false,
                 permModalVisible: false,
                 depModalVisible: false,
-
+                resourcesShow:false,
                 modalTitle: "",
                 //子系统类型对象数组
                 types: [{id:"OA",name:"OA"},{id:"CW",name:"财务"},{id:"",name:"其他"}],
@@ -265,9 +287,6 @@
                     ],
                     url: [
                         { required: true, message: "url不能为空", trigger: "blur" }
-                    ],
-                    department: [
-                        { required: true, message: "不能为空", trigger: "blur" }
                     ],
 
                 },
@@ -614,6 +633,15 @@
                     }
                 });
             },
+            submitUpdate(){
+                uploadfileForlink
+                this.$refs.myUpchild.upSubmit(this.editSubsystemNews);
+            },
+            getUpdate(item){
+
+                this.getRoleList();
+                this.roleModalVisible = false;
+            },
             /*
                     newsIsTop: "",//是否置顶*/
             //链接编辑的提交
@@ -642,10 +670,10 @@
                 this.roleModalVisible = true;
             },
             addSystem() {
-
+                this.resourcesShow=false;
                 this.modalType = 0;
                 this.modalTitle = "添加链接";
-
+                this.editSubsystemNews.department="";
                 this.$refs['editSubsystemNews'].resetFields(),
                     //清空表begin
                     /*  this.newForm.newsTitle="";
@@ -660,6 +688,26 @@
 
                     delete this.editSubsystemNews.id;
                     this.roleModalVisible = true;
+            },
+            addResources() {
+                this.resourcesShow=true;
+                this.modalType = 0;
+                this.modalTitle = "添加资源";
+                this.editSubsystemNews.department="";
+                this.$refs['editSubsystemNews'].resetFields(),
+                    //清空表begin
+                    /*  this.newForm.newsTitle="";
+                      this.newForm.newsConten="";
+                      this.newForm.newsDesc="";
+                      this.newForm.newsImagePath="";
+                      this.newForm.newsRate="";
+                      this.newForm.newsIsTop="";
+                      this.newForm.imageId="";*/
+                    //清空表end
+
+
+                    delete this.editSubsystemNews.id;
+                this.roleModalVisible = true;
             },
             edit(v) {
                 this.modalType = 1;
@@ -974,7 +1022,7 @@
             },
             //接受部门的名字
             editDepTitle(data){
-                this.BJInfo.department=data;
+                this.editSubsystemNews.department=data;
             },
         },
         mounted() {
